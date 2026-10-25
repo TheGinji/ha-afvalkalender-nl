@@ -40,12 +40,12 @@ Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
 - **Volgende ophaling**: de eerstvolgende datum van alle soorten.
   Attributen: `days_until`, `days_text`, `waste_types`, `waste_types_text`.
 
-`days_text` is een leesbare tekst: `vandaag`, `morgen` of `over 4 dagen` (Engels als Home Assistant
-niet op Nederlands staat: `today`, `tomorrow`, `in 4 days`).
+`days_text` is een leesbare tekst: `Vandaag`, `Morgen` of `Over 4 dagen` (Engels als Home Assistant
+niet op Nederlands staat: `Today`, `Tomorrow`, `In 4 days`).
 
 De exacte entity_id's staan onder Instellingen → Apparaten & services → Entiteiten.
 
-## Voorbeeld: badge met "over 4 dagen"
+## Voorbeeld: badge met "Over 4 dagen"
 
 ```yaml
 type: entity
