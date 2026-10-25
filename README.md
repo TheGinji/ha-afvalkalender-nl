@@ -52,13 +52,13 @@ triggers:
 conditions:
   - condition: template
     value_template: >
-      {{ state_attr('sensor.afvalkalender_8935lp_185_volgende_ophaling', 'days_until') == 1 }}
+      {{ state_attr('sensor.afvalkalender_postcode_huisnumer_volgende_ophaling', 'days_until') == 1 }}
 actions:
   - action: notify.notify
     data:
       message: >
         Morgen wordt opgehaald:
-        {{ state_attr('sensor.afvalkalender_8935lp_185_volgende_ophaling', 'waste_types_text') }}
+        {{ state_attr('sensor.afvalkalender_postcode_huisnummer_volgende_ophaling', 'waste_types_text') }}
 ```
 
 ## Licentie
