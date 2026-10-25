@@ -85,15 +85,15 @@ class TrashBaseSensor(CoordinatorEntity[TrashApiCoordinator], SensorEntity):
         return dt_util.now().date()
 
     def _days_text(self, days: int | None) -> str | None:
-        """Readable countdown: vandaag / morgen / over N dagen (English when HA is not Dutch)."""
+        """Readable countdown: Vandaag / Morgen / Over N dagen (English when HA is not Dutch)."""
         if days is None:
             return None
         dutch = str(self.hass.config.language).lower().startswith("nl")
         if days <= 0:
-            return "vandaag" if dutch else "today"
+            return "Vandaag" if dutch else "Today"
         if days == 1:
-            return "morgen" if dutch else "tomorrow"
-        return f"over {days} dagen" if dutch else f"in {days} days"
+            return "Morgen" if dutch else "Tomorrow"
+        return f"Over {days} dagen" if dutch else f"In {days} days"
 
 
 class TrashTypeSensor(TrashBaseSensor):
