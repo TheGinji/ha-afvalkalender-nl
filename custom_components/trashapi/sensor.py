@@ -84,6 +84,17 @@ class TrashBaseSensor(CoordinatorEntity[TrashApiCoordinator], SensorEntity):
     def _today() -> date:
         return dt_util.now().date()
 
+    def _days_text(self, days: int | None) -> str | None:
+        """Readable countdown: vandaag / morgen / over N dagen (English when HA is not Dutch)."""
+        if days is None:
+            return None
+        dutch = str(self.hass.config.language).lower().startswith("nl")
+        if days <= 0:
+            return "vandaag" if dutch else "today"
+        if days == 1:
+            return "morgen" if dutch else "tomorrow"
+        return f"over {days} dagen" if dutch else f"in {days} days"
+
 
 class TrashTypeSensor(TrashBaseSensor):
     """Next pickup for one waste type (Restafval, Gft, Papier, ...)."""
@@ -110,8 +121,10 @@ class TrashTypeSensor(TrashBaseSensor):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         upcoming = self._upcoming()
+        days = (upcoming[0] - self._today()).days if upcoming else None
         return {
-            "days_until": (upcoming[0] - self._today()).days if upcoming else None,
+            "days_until": days,
+            "days_text": self._days_text(days),
             "upcoming_dates": [d.isoformat() for d in upcoming[:UPCOMING_LIMIT]],
         }
 
@@ -147,8 +160,10 @@ class NextPickupSensor(TrashBaseSensor):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         pickup, types = self._next()
+        days = (pickup - self._today()).days if pickup else None
         return {
-            "days_until": (pickup - self._today()).days if pickup else None,
+            "days_until": days,
+            "days_text": self._days_text(days),
             "waste_types": types,
             "waste_types_text": ", ".join(types),
         }
