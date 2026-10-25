@@ -72,6 +72,22 @@ actions:
         {{ state_attr('sensor.afvalkalender_postcode_huisnummer_volgende_ophaling', 'waste_types_text') }}
 ```
 
+### De automatisering toevoegen
+
+1. Ga naar Instellingen → Automatiseringen en scènes → **Automatisering maken** → **Nieuwe automatisering maken**.
+2. Tik rechtsboven op het menu met drie puntjes en kies **Bewerken in YAML**.
+3. Wis wat er staat, plak je YAML en tik op **Opslaan**.
+
+Pas eerst twee dingen aan, anders doet hij niets:
+
+- **Entity-ID:** `sensor.afvalkalender_postcode_huisnummer_volgende_ophaling` is een voorbeeld.
+  Zoek de echte op onder Instellingen → Entiteiten (zoek op "volgende ophaling"). Die heet iets als
+  `sensor.afvalkalender_1234ab_12_volgende_ophaling`. Vervang hem op twee plekken.
+- **Notify:** `notify.notify` bestaat vaak niet. Zoek je telefoon onder Ontwikkelhulpmiddelen → Acties
+  (zoek op "notify"). Die heet iets als `notify.mobile_app_jouw_telefoon`.
+
+Met **Uitvoeren** in het menu van de automatisering kun je de melding direct testen.
+
 ## Licentie
 
 MIT
