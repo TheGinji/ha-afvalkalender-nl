@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HA Dutch Trash Calendar",
+        "description": "Vul het adres in waarvoor je de ophaaldata wilt ophalen.",
+        "data": {
+          "location": "Plaats",
+          "zip_code": "Postcode",
+          "house_number": "Huisnummer",
+          "show_whole_year": "Hele jaar tonen (ShowWholeYear)",
+          "get_cleanprofs_data": "Cleanprofs-data ophalen (GetCleanprofsData)",
+          "ignore_cache": "Cache van de API negeren (IgnoreCache)",
+          "scan_interval_hours": "Verversen elke (uren)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan de TrashAPI niet bereiken.",
+      "invalid_response": "De API gaf een onverwacht antwoord.",
+      "no_data": "Geen ophaaldata gevonden voor dit adres."
+    },
+    "abort": {
+      "already_configured": "Dit adres is al toegevoegd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Afvalkalender aanpassen",
+        "data": {
+          "location": "Plaats",
+          "zip_code": "Postcode",
+          "house_number": "Huisnummer",
+          "show_whole_year": "Hele jaar tonen (ShowWholeYear)",
+          "get_cleanprofs_data": "Cleanprofs-data ophalen (GetCleanprofsData)",
+          "ignore_cache": "Cache van de API negeren (IgnoreCache)",
+          "scan_interval_hours": "Verversen elke (uren)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan de TrashAPI niet bereiken.",
+      "invalid_response": "De API gaf een onverwacht antwoord.",
+      "no_data": "Geen ophaaldata gevonden voor dit adres."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "next_pickup": {
+        "name": "Volgende ophaling"
+      }
+    }
+  }
+}
