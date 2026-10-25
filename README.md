@@ -35,12 +35,23 @@ Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
 ## Entiteiten
 
 - **Per afvalsoort** (Restafval, Gft, Papier, Grofvuil, ...): een sensor met de volgende ophaaldatum.
-  Attributen: `days_until`, `upcoming_dates`. Nieuwe soorten die later in de kalender
+  Attributen: `days_until`, `days_text`, `upcoming_dates`. Nieuwe soorten die later in de kalender
   verschijnen krijgen automatisch een sensor.
 - **Volgende ophaling**: de eerstvolgende datum van alle soorten.
-  Attributen: `days_until`, `waste_types`, `waste_types_text`.
+  Attributen: `days_until`, `days_text`, `waste_types`, `waste_types_text`.
+
+`days_text` is een leesbare tekst: `vandaag`, `morgen` of `over 4 dagen` (Engels als Home Assistant
+niet op Nederlands staat: `today`, `tomorrow`, `in 4 days`).
 
 De exacte entity_id's staan onder Instellingen → Apparaten & services → Entiteiten.
+
+## Voorbeeld: badge met "over 4 dagen"
+
+```yaml
+type: entity
+entity: sensor.afvalkalender_postcode_huisnummer_restafval
+state_content: days_text
+```
 
 ## Voorbeeld: melding de avond ervoor
 
@@ -52,7 +63,7 @@ triggers:
 conditions:
   - condition: template
     value_template: >
-      {{ state_attr('sensor.afvalkalender_postcode_huisnumer_volgende_ophaling', 'days_until') == 1 }}
+      {{ state_attr('sensor.afvalkalender_postcode_huisnummer_volgende_ophaling', 'days_until') == 1 }}
 actions:
   - action: notify.notify
     data:
