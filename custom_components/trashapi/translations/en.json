@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HA Dutch Trash Calendar",
+        "description": "Enter the address to fetch the pickup dates for.",
+        "data": {
+          "location": "City",
+          "zip_code": "Zip code",
+          "house_number": "House number",
+          "show_whole_year": "Show whole year (ShowWholeYear)",
+          "get_cleanprofs_data": "Get Cleanprofs data (GetCleanprofsData)",
+          "ignore_cache": "Ignore API cache (IgnoreCache)",
+          "scan_interval_hours": "Refresh every (hours)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach TrashAPI.",
+      "invalid_response": "The API returned an unexpected response.",
+      "no_data": "No pickup data found for this address."
+    },
+    "abort": {
+      "already_configured": "This address is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Edit waste calendar",
+        "data": {
+          "location": "City",
+          "zip_code": "Zip code",
+          "house_number": "House number",
+          "show_whole_year": "Show whole year (ShowWholeYear)",
+          "get_cleanprofs_data": "Get Cleanprofs data (GetCleanprofsData)",
+          "ignore_cache": "Ignore API cache (IgnoreCache)",
+          "scan_interval_hours": "Refresh every (hours)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach TrashAPI.",
+      "invalid_response": "The API returned an unexpected response.",
+      "no_data": "No pickup data found for this address."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "next_pickup": {
+        "name": "Next pickup"
+      }
+    }
+  }
+}
