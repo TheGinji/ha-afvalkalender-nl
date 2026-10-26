@@ -50,6 +50,29 @@
       "next_pickup": {
         "name": "Volgende ophaling"
       }
+    },
+    "binary_sensor": {
+      "pickup_today": {
+        "name": "Ophaling vandaag"
+      },
+      "pickup_tomorrow": {
+        "name": "Ophaling morgen"
+      }
+    },
+    "calendar": {
+      "pickup_calendar": {
+        "name": "Ophaaldagen"
+      }
+    }
+  },
+  "issues": {
+    "api_unavailable": {
+      "title": "TrashAPI is niet bereikbaar",
+      "description": "De afvalkalender voor {address} kon meerdere keren achter elkaar niet worden opgehaald ({error}). De sensoren zijn tijdelijk niet beschikbaar. Dit verdwijnt vanzelf zodra de API weer antwoordt."
+    },
+    "no_data": {
+      "title": "Geen ophaaldata gevonden",
+      "description": "De TrashAPI geeft op dit moment geen ophaaldata voor {address}. De laatst bekende gegevens blijven zichtbaar. Controleer via Configureren of plaats, postcode en huisnummer kloppen. Rond de jaarwisseling kan het even duren voordat de nieuwe kalender beschikbaar is."
     }
   }
 }
