@@ -50,6 +50,29 @@
       "next_pickup": {
         "name": "Next pickup"
       }
+    },
+    "binary_sensor": {
+      "pickup_today": {
+        "name": "Pickup today"
+      },
+      "pickup_tomorrow": {
+        "name": "Pickup tomorrow"
+      }
+    },
+    "calendar": {
+      "pickup_calendar": {
+        "name": "Pickup days"
+      }
+    }
+  },
+  "issues": {
+    "api_unavailable": {
+      "title": "TrashAPI is unreachable",
+      "description": "The waste calendar for {address} could not be fetched several times in a row ({error}). The sensors are temporarily unavailable. This clears by itself as soon as the API responds again."
+    },
+    "no_data": {
+      "title": "No pickup data found",
+      "description": "TrashAPI currently returns no pickup data for {address}. The last known data stays visible. Check via Configure that city, zip code and house number are correct. Around the new year it can take a while before the new calendar is available."
     }
   }
 }
