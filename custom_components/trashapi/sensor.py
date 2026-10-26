@@ -123,6 +123,7 @@ class TrashTypeSensor(TrashBaseSensor):
         upcoming = self._upcoming()
         days = (upcoming[0] - self._today()).days if upcoming else None
         return {
+            "waste_type": self._waste_type,
             "days_until": days,
             "days_text": self._days_text(days),
             "upcoming_dates": [d.isoformat() for d in upcoming[:UPCOMING_LIMIT]],
