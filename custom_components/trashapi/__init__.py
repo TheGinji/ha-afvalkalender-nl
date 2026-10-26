@@ -2,43 +2,33 @@
 
 from __future__ import annotations
 
-import hashlib
 import logging
-from pathlib import Path
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
-from .coordinator import TrashApiConfigEntry, TrashApiCoordinator
+from .coordinator import (
+    ISSUE_API,
+    ISSUE_NO_DATA,
+    TrashApiConfigEntry,
+    TrashApiCoordinator,
+    issue_id,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR]
-
-CARD_FILE = Path(__file__).parent / "www" / "trash-containers-card.js"
-CARD_URL = f"/{DOMAIN}_static/trash-containers-card.js"
-
-
-def _file_digest(path: Path) -> str:
-    return hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()[:10]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.CALENDAR, Platform.SENSOR]
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Serve the dashboard card and load it in the frontend.
-
-    The card is optional: if anything goes wrong here the integration still works.
-    """
+    """Serve the dashboard card. The card is optional: errors here never block the integration."""
     try:
-        from homeassistant.components import frontend
-        from homeassistant.components.http import StaticPathConfig
+        from .card import async_register_card
 
-        digest = await hass.async_add_executor_job(_file_digest, CARD_FILE)
-        await hass.http.async_register_static_paths(
-            [StaticPathConfig(CARD_URL, str(CARD_FILE), False)]
-        )
-        frontend.add_extra_js_url(hass, f"{CARD_URL}?v={digest}")
+        await async_register_card(hass)
     except Exception:  # noqa: BLE001
         _LOGGER.warning("Could not register the dashboard card", exc_info=True)
     return True
@@ -61,3 +51,9 @@ async def _async_reload_entry(hass: HomeAssistant, entry: TrashApiConfigEntry) -
 
 async def async_unload_entry(hass: HomeAssistant, entry: TrashApiConfigEntry) -> bool:
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: TrashApiConfigEntry) -> None:
+    """Remove repair notices together with the integration."""
+    for key in (ISSUE_API, ISSUE_NO_DATA):
+        ir.async_delete_issue(hass, DOMAIN, issue_id(key, entry.entry_id))
