@@ -4,7 +4,8 @@
 
 Home Assistant integration voor de afvalkalender-API op
 <https://trashapi.azurewebsites.net>. Je vult plaats, postcode en huisnummer in en
-krijgt per afvalsoort een sensor met de volgende ophaaldatum.
+krijgt per afvalsoort een sensor met de volgende ophaaldatum, plus een dashboardkaart met
+containers.
 
 ## Installeren via HACS
 
@@ -35,8 +36,8 @@ Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
 ## Entiteiten
 
 - **Per afvalsoort** (Restafval, Gft, Papier, Grofvuil, ...): een sensor met de volgende ophaaldatum.
-  Attributen: `days_until`, `days_text`, `upcoming_dates`. Nieuwe soorten die later in de kalender
-  verschijnen krijgen automatisch een sensor.
+  Attributen: `waste_type`, `days_until`, `days_text`, `upcoming_dates`. Nieuwe soorten die later in
+  de kalender verschijnen krijgen automatisch een sensor.
 - **Volgende ophaling**: de eerstvolgende datum van alle soorten.
   Attributen: `days_until`, `days_text`, `waste_types`, `waste_types_text`.
 
@@ -44,6 +45,48 @@ Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
 niet op Nederlands staat: `Today`, `Tomorrow`, `In 4 days`).
 
 De exacte entity_id's staan onder Instellingen → Apparaten & services → Entiteiten.
+
+## Dashboardkaart met containers
+
+De integratie levert zelf een kaart mee. Je hoeft niets te installeren of als resource toe te voegen.
+Kies bij een nieuwe kaart **HA Dutch Trash Calendar**, of gebruik YAML:
+
+```yaml
+type: custom:trash-containers-card
+title: Afval
+```
+
+Zonder verdere opties toont de kaart alle sensoren van de integratie, de eerstvolgende ophaling
+vooraan. De containers zijn grijs met een gekleurde deksel: restafval paars, gft groen, papier blauw
+(PMD oranje, glas turquoise, grofvuil bruin). Op de ophaaldag springt de container en heeft hij een
+gekleurde rand, de dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details.
+
+| Optie | Uitleg | Standaard |
+|---|---|---|
+| `title` | Titel boven de kaart | geen |
+| `show_date` | Datum (bijv. "di 3 nov") onder het aantal dagen | `true` |
+| `sort` | Eerstvolgende ophaling vooraan | `true` |
+| `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
+| `colors` | Deksel-kleur per afvalsoort | zie boven |
+
+Voorbeeld met eigen volgorde, naam en kleur:
+
+```yaml
+type: custom:trash-containers-card
+title: Afval
+show_date: false
+entities:
+  - sensor.afvalkalender_1234ab_12_restafval
+  - entity: sensor.afvalkalender_1234ab_12_gft
+    name: Groen
+    color: "#2e9e4f"
+  - sensor.afvalkalender_1234ab_12_papier
+colors:
+  restafval: "#8e44ad"
+```
+
+Zie je de kaart niet na een update? Herstart Home Assistant en ververs de pagina hard
+(Ctrl/Cmd+Shift+R), of reset de frontend-cache in de app.
 
 ## Voorbeeld: badge met "Over 4 dagen"
 
