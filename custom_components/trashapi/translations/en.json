@@ -74,5 +74,13 @@
       "title": "No pickup data found",
       "description": "TrashAPI currently returns no pickup data for {address}. The last known data stays visible. Check via Configure that city, zip code and house number are correct. Around the new year it can take a while before the new calendar is available."
     }
+  },
+  "exceptions": {
+    "api_error": {
+      "message": "Error fetching the waste calendar: {error}"
+    },
+    "no_data": {
+      "message": "TrashAPI returned no pickup data."
+    }
   }
 }
