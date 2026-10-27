@@ -16,6 +16,7 @@ krijgt per afvalsoort een sensor met de volgende ophaaldatum, een agenda, sensor
 5. Instellingen → Apparaten & services → Integratie toevoegen → **HA Dutch Trash Calendar**
 
 Handmatig kan ook: kopieer `custom_components/trashapi` naar `/config/custom_components/`.
+Vereist Home Assistant 2024.11 of nieuwer.
 
 ## Instellingen
 
@@ -53,6 +54,15 @@ De exacte entity_id's staan onder Instellingen → Apparaten & services → Enti
 Verdwijnt een afvalsoort uit de API (bijvoorbeeld omdat de bron een foutieve regel corrigeert), dan
 blijft de bijbehorende sensor als "niet beschikbaar" achter. Verwijder hem dan onder Instellingen →
 Entiteiten. Komt de soort terug, dan wordt de sensor vanzelf opnieuw aangemaakt.
+
+## Hoe worden de gegevens ververst?
+
+- De integratie vraagt de API om de zoveel uur om de kalender (standaard elke **6 uur**, instelbaar
+  van 1 tot 48 uur via **Configureren**). Dat is voldoende, want ophaaldagen veranderen zelden.
+- De sensoren, binary sensors en de agenda springen **elke nacht kort na 00:00** vanzelf door naar
+  de volgende datum, zonder nieuwe API-aanroep. "Morgen" wordt dus vanzelf "Vandaag".
+- Direct verversen kan met de actie `homeassistant.update_entity` op een van de sensoren van de
+  integratie. Met de optie **Cache negeren** vraag je de API om haar eigen cache over te slaan.
 
 ## Dashboardkaart met containers
 
@@ -122,12 +132,71 @@ Kant-en-klare voorbeelden staan in [docs/afval-automatiseringen.md](docs/afval-a
 
 Het document legt ook uit hoe je ze toevoegt en welke namen (entity-ID's en telefoons) je moet aanpassen.
 
+## Toepassingen
+
+- Een dashboard of wandpaneel dat in één oogopslag laat zien welke container als eerste buiten moet.
+- Een melding op je telefoon de avond ervoor, met een herinnering als je de container nog niet buiten
+  hebt gezet.
+- De ophaaldagen in de gedeelde gezinsagenda, door de agenda-entiteit te laten tonen of te
+  synchroniseren.
+- Vragen aan Assist ("welke bak moet er morgen buiten?").
+- Lampen of een display die kleuren op de dag dat er iets wordt opgehaald, met de sensor
+  "Ophaling morgen" als trigger.
+
 ## Reparatiemeldingen
 
 Kan de API twee keer achter elkaar niet worden bereikt, dan verschijnt onder Instellingen →
 Systeem → Reparaties de melding "TrashAPI is niet bereikbaar". Geeft de API geen ophaaldata meer
 voor je adres, dan zie je "Geen ophaaldata gevonden" en blijven de laatst bekende gegevens zichtbaar.
 De meldingen verdwijnen vanzelf zodra de API weer werkt.
+
+## Bekende beperkingen
+
+- De integratie is **niet verbonden met een gemeente of afvalinzamelaar** en is afhankelijk van de
+  externe TrashAPI. Valt die weg of verandert hij, dan werkt de integratie niet meer. Voor welke
+  gemeenten de API gegevens heeft, bepaalt de API.
+- Je krijgt alleen wat de API teruggeeft. **Afvalsoorten kunnen verdwijnen of een andere naam krijgen**
+  als de bron wordt aangepast. Ophalingen op aanvraag (bijvoorbeeld grofvuil) staan er alleen in als
+  de API ze levert.
+- Er zijn alleen **datums, geen tijdstippen**. Rond de **jaarwisseling** kan het even duren voordat de
+  nieuwe kalender beschikbaar is; de laatst bekende gegevens blijven dan zichtbaar.
+- Gegevens worden periodiek opgehaald; er zijn **geen directe updates**.
+- De kaart kent kleuren voor veelvoorkomende soorten. Onbekende soorten krijgen een neutrale kleur,
+  die je met `colors` kunt aanpassen.
+
+## Probleemoplossing
+
+- **Sensoren zijn "niet beschikbaar".** Kijk onder Instellingen → Systeem → Reparaties en in het
+  logboek (zoek op `trashapi`). Open de API in je browser om te zien of hij antwoordt:
+  `https://trashapi.azurewebsites.net/Trash?Location=PLAATS&ZipCode=1234AB&HouseNumber=12&ShowWholeYear=true&GetCleanprofsData=true&IgnoreCache=false`
+- **"Geen ophaaldata gevonden" bij het toevoegen.** Controleer de postcode (zonder spatie), het
+  huisnummer en de plaatsnaam via de link hierboven.
+- **Een afvalsoort is weg of "niet beschikbaar".** Verwijder de oude sensor onder Instellingen →
+  Entiteiten (zie "Entiteiten").
+- **De kaart toont een foutmelding.** Zie de tips bij "Dashboardkaart met containers".
+- **Meer details in het logboek.** Zet dit in `configuration.yaml` en herstart:
+
+  ```yaml
+  logger:
+    default: warning
+    logs:
+      custom_components.trashapi: debug
+  ```
+
+- **Een probleem melden.** Download eerst de diagnostische gegevens: Instellingen → Apparaten &
+  services → HA Dutch Trash Calendar → menu met drie puntjes → **Diagnostische gegevens downloaden**.
+  Plaats, postcode en huisnummer worden daarin automatisch weggelaten. Voeg het bestand toe aan je
+  [melding op GitHub](https://github.com/TheGinji/ha-dutch-trash-calendar/issues).
+
+## Verwijderen
+
+1. Instellingen → Apparaten & services → **HA Dutch Trash Calendar** → menu met drie puntjes naast
+   de invoer → **Verwijderen**. De sensoren en de agenda verdwijnen daarmee.
+2. Wil je ook de bestanden weghalen? Open HACS → HA Dutch Trash Calendar → menu → **Verwijderen** en
+   herstart Home Assistant.
+3. Optioneel: de dashboardkaart staat nog als resource onder Instellingen → Dashboards → menu →
+   **Resources**. Verwijder `/trashapi_static/trash-containers-card.js` daar zelf als je wilt.
+   Eigen automatiseringen en helpers (zoals uit `docs/`) blijven staan en moet je zelf opruimen.
 
 ## Licentie
 
