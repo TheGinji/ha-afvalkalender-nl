@@ -12,6 +12,8 @@ from homeassistant.util import dt as dt_util
 from .coordinator import TrashApiConfigEntry, TrashApiCoordinator
 from .entity import TrashEntity
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -25,7 +27,6 @@ class TrashCalendar(TrashEntity, CalendarEntity):
     """Every pickup is an all-day event named after the waste type."""
 
     _attr_translation_key = "pickup_calendar"
-    _attr_icon = "mdi:calendar-month"
 
     def __init__(self, coordinator: TrashApiCoordinator, entry: TrashApiConfigEntry) -> None:
         super().__init__(coordinator, entry)
