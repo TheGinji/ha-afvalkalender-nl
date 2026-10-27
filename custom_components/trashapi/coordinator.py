@@ -82,7 +82,11 @@ class TrashApiCoordinator(DataUpdateCoordinator[dict[str, list[date]]]):
             self._failures += 1
             if self._failures >= FAILURES_BEFORE_ISSUE:
                 self._raise_issue(ISSUE_API, error=str(err))
-            raise UpdateFailed(f"Error talking to TrashAPI: {err}") from err
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="api_error",
+                translation_placeholders={"error": str(err)},
+            ) from err
 
         self._failures = 0
         self._clear_issue(ISSUE_API)
@@ -91,7 +95,7 @@ class TrashApiCoordinator(DataUpdateCoordinator[dict[str, list[date]]]):
             self._raise_issue(ISSUE_NO_DATA)
             if self.data:
                 return self.data  # keep showing the last known calendar
-            raise UpdateFailed("TrashAPI returned no pickup data")
+            raise UpdateFailed(translation_domain=DOMAIN, translation_key="no_data")
 
         self._clear_issue(ISSUE_NO_DATA)
         return data
