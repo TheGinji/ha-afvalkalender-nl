@@ -12,6 +12,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .coordinator import TrashApiConfigEntry, TrashApiCoordinator
 from .entity import TrashEntity
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -53,10 +55,6 @@ class TrashPickupBinarySensor(TrashEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         return bool(self._types())
-
-    @property
-    def icon(self) -> str:
-        return "mdi:trash-can" if self.is_on else "mdi:trash-can-outline"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
