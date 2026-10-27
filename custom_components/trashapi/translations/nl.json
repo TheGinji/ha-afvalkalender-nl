@@ -74,5 +74,13 @@
       "title": "Geen ophaaldata gevonden",
       "description": "De TrashAPI geeft op dit moment geen ophaaldata voor {address}. De laatst bekende gegevens blijven zichtbaar. Controleer via Configureren of plaats, postcode en huisnummer kloppen. Rond de jaarwisseling kan het even duren voordat de nieuwe kalender beschikbaar is."
     }
+  },
+  "exceptions": {
+    "api_error": {
+      "message": "Fout bij het ophalen van de afvalkalender: {error}"
+    },
+    "no_data": {
+      "message": "De TrashAPI gaf geen ophaaldata terug."
+    }
   }
 }
