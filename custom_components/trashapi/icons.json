@@ -1,0 +1,28 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "pickup_today": {
+        "default": "mdi:trash-can-outline",
+        "state": {
+          "on": "mdi:trash-can"
+        }
+      },
+      "pickup_tomorrow": {
+        "default": "mdi:trash-can-outline",
+        "state": {
+          "on": "mdi:trash-can"
+        }
+      }
+    },
+    "calendar": {
+      "pickup_calendar": {
+        "default": "mdi:calendar-month"
+      }
+    },
+    "sensor": {
+      "next_pickup": {
+        "default": "mdi:calendar-clock"
+      }
+    }
+  }
+}
