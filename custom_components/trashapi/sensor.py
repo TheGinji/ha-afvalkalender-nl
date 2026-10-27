@@ -25,6 +25,8 @@ from .const import (
 )
 from .coordinator import TrashApiConfigEntry, TrashApiCoordinator
 
+PARALLEL_UPDATES = 0
+
 UPCOMING_LIMIT = 10
 
 
@@ -106,6 +108,7 @@ class TrashTypeSensor(TrashBaseSensor):
         self._waste_type = waste_type
         self._attr_name = waste_type
         self._attr_unique_id = f"{entry.entry_id}_{slugify(waste_type)}"
+        # Waste types come from the API, so their icons cannot live in icons.json
         self._attr_icon = ICONS.get(waste_type.lower(), DEFAULT_ICON)
 
     def _upcoming(self) -> list[date]:
@@ -134,7 +137,6 @@ class NextPickupSensor(TrashBaseSensor):
     """The next pickup of any waste type."""
 
     _attr_translation_key = "next_pickup"
-    _attr_icon = "mdi:calendar-clock"
 
     def __init__(self, coordinator: TrashApiCoordinator, entry: TrashApiConfigEntry) -> None:
         super().__init__(coordinator, entry)
