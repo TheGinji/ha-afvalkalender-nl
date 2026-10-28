@@ -6,6 +6,10 @@
  *   title: Afval
  *   show_date: true          # small date under the countdown
  *   group_by_address: true   # with several addresses: one heading per address
+ *   addresses:               # per address (the key is the address as shown in the editor)
+ *     "Afvalkalender 1234AB 12":
+ *       name: Thuis          # heading to show instead of the device name
+ *       show: false          # hide this address
  *   sort: true               # soonest pickup first
  *   entities:                # limit / order the containers yourself
  *     - sensor.afvalkalender_1234ab_12_restafval
@@ -49,6 +53,19 @@ const binSvg = (lid) => `
 const isTrashSensor = (st) =>
   st && st.attributes && "days_until" in st.attributes && "upcoming_dates" in st.attributes;
 
+// "Afvalkalender 1234AB 12 Gft" with waste type "Gft" -> "Afvalkalender 1234AB 12"
+const addressOf = (attrs) => {
+  const friendly = String(attrs.friendly_name || "");
+  return attrs.waste_type && friendly.endsWith(attrs.waste_type)
+    ? friendly.slice(0, friendly.length - attrs.waste_type.length).trim()
+    : "";
+};
+
+const candidateIds = (hass, config) =>
+  config.entities && config.entities.length
+    ? config.entities.map((ref) => (typeof ref === "string" ? ref : ref.entity))
+    : Object.keys(hass.states).filter((id) => id.startsWith("sensor.") && isTrashSensor(hass.states[id]));
+
 const escapeHtml = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
@@ -84,6 +101,10 @@ class TrashContainersCard extends HTMLElement {
     return {};
   }
 
+  static getConfigElement() {
+    return document.createElement("trash-containers-card-editor");
+  }
+
   _color(type, override) {
     if (override) return override;
     const key = String(type || "").toLowerCase();
@@ -115,15 +136,14 @@ class TrashContainersCard extends HTMLElement {
         const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
         dateLabel = d.toLocaleDateString(lang, { weekday: "short", day: "numeric", month: "short" });
       }
-      const friendly = String(a.friendly_name || "");
-      const group =
-        a.waste_type && friendly.endsWith(a.waste_type)
-          ? friendly.slice(0, friendly.length - a.waste_type.length).trim()
-          : "";
+      const group = addressOf(a);
+      const address = (this._config.addresses || {})[group] || {};
+      if (address.show === false) continue;
       items.push({
         id: opts.entity,
         type,
         group,
+        groupLabel: address.name || group || "Overig",
         days,
         text: a.days_text || (days === null ? "–" : String(days)),
         dateLabel,
@@ -153,8 +173,10 @@ class TrashContainersCard extends HTMLElement {
     };
 
     // With several addresses: one heading per address, in a fixed (alphabetical) order
-    const groups = [...new Set(items.map((i) => i.group))].sort((x, y) => x.localeCompare(y));
-    const showHeadings = this._config.group_by_address !== false && groups.length > 1;
+    const labels = new Map(items.map((i) => [i.group, i.groupLabel]));
+    const groups = [...labels.keys()].sort((x, y) => labels.get(x).localeCompare(labels.get(y)));
+    const renamed = items.some((i) => (this._config.addresses || {})[i.group]?.name);
+    const showHeadings = this._config.group_by_address !== false && (groups.length > 1 || renamed);
 
     let body;
     let rows = 0;
@@ -166,7 +188,7 @@ class TrashContainersCard extends HTMLElement {
         .map((g) => {
           const own = items.filter((i) => i.group === g);
           rows += 1 + Math.ceil(own.length / 4);
-          return `<div class="group">${escapeHtml(g || "Overig")}</div><div class="row">${own.map(renderItem).join("")}</div>`;
+          return `<div class="group">${escapeHtml(labels.get(g))}</div><div class="row">${own.map(renderItem).join("")}</div>`;
         })
         .join("");
     } else {
@@ -214,6 +236,163 @@ class TrashContainersCard extends HTMLElement {
   }
 }
 
+
+const EDITOR_TEXT = {
+  nl: {
+    title: "Titel",
+    show_date: "Datum tonen",
+    sort: "Eerstvolgende ophaling vooraan",
+    group_by_address: "Kopje per adres tonen",
+    name: (g) => `Naam voor ${g}`,
+    show: (g) => `${g} tonen`,
+  },
+  en: {
+    title: "Title",
+    show_date: "Show date",
+    sort: "Soonest pickup first",
+    group_by_address: "Show a heading per address",
+    name: (g) => `Name for ${g}`,
+    show: (g) => `Show ${g}`,
+  },
+};
+
+class TrashContainersCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.innerHTML = "<style>:host { display: block; }</style>";
+    this._form = null;
+    this._key = null;
+  }
+
+  setConfig(config) {
+    this._config = config || {};
+    this._sync(true);
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    this._sync(false);
+  }
+
+  _text() {
+    const lang = String(this._hass?.locale?.language || this._hass?.language || "nl");
+    return lang.startsWith("nl") ? EDITOR_TEXT.nl : EDITOR_TEXT.en;
+  }
+
+  // The addresses currently known (also hidden ones, so they can be switched on again)
+  _groups() {
+    const hass = this._hass;
+    const found = new Set();
+    for (const id of candidateIds(hass, this._config)) {
+      const st = hass.states[id];
+      const group = st ? addressOf(st.attributes || {}) : "";
+      if (group) found.add(group);
+    }
+    for (const group of Object.keys(this._config.addresses || {})) found.add(group);
+    return [...found].sort((x, y) => x.localeCompare(y));
+  }
+
+  _schema(groups) {
+    return [
+      { name: "title", selector: { text: {} } },
+      {
+        type: "grid",
+        name: "",
+        schema: [
+          { name: "show_date", selector: { boolean: {} } },
+          { name: "sort", selector: { boolean: {} } },
+          { name: "group_by_address", selector: { boolean: {} } },
+        ],
+      },
+      ...groups.map((group, i) => ({
+        type: "expandable",
+        name: "",
+        title: group,
+        schema: [
+          { name: `name_${i}`, selector: { text: {} } },
+          { name: `show_${i}`, selector: { boolean: {} } },
+        ],
+      })),
+    ];
+  }
+
+  _data(groups) {
+    const c = this._config;
+    const data = {
+      title: c.title || "",
+      show_date: c.show_date !== false,
+      sort: c.sort !== false,
+      group_by_address: c.group_by_address !== false,
+    };
+    groups.forEach((group, i) => {
+      const address = (c.addresses || {})[group] || {};
+      data[`name_${i}`] = address.name || "";
+      data[`show_${i}`] = address.show !== false;
+    });
+    return data;
+  }
+
+  _sync(refreshData) {
+    if (!this._config || !this._hass) return;
+    const groups = this._groups();
+    if (!this._form) {
+      this._form = document.createElement("ha-form");
+      this._form.addEventListener("value-changed", (ev) => this._changed(ev));
+      this.shadowRoot.append(this._form);
+    }
+    const key = JSON.stringify([groups, this._text() === EDITOR_TEXT.nl]);
+    if (key !== this._key) {
+      this._key = key;
+      const t = this._text();
+      this._form.schema = this._schema(groups);
+      this._form.computeLabel = (schema) => {
+        const name = schema.name || "";
+        const address = /^(name|show)_(\d+)$/.exec(name);
+        if (address) return t[address[1]](groups[Number(address[2])]);
+        return t[name] || schema.title || "";
+      };
+      refreshData = true;
+    }
+    this._form.hass = this._hass;
+    if (refreshData) this._form.data = this._data(groups);
+  }
+
+  _changed(ev) {
+    ev.stopPropagation();
+    const value = ev.detail.value || {};
+    const groups = this._groups();
+    const config = { ...this._config };
+
+    // Only store what differs from the defaults, so the YAML stays short
+    if (value.title) config.title = value.title;
+    else delete config.title;
+    for (const key of ["show_date", "sort", "group_by_address"]) {
+      if (value[key] === false) config[key] = false;
+      else delete config[key];
+    }
+
+    const addresses = {};
+    groups.forEach((group, i) => {
+      const name = String(value[`name_${i}`] || "").trim();
+      const visible = value[`show_${i}`] !== false;
+      if (name || !visible) addresses[group] = { ...(name ? { name } : {}), ...(visible ? {} : { show: false }) };
+    });
+    // Keep settings of addresses that are not available right now
+    for (const [group, setting] of Object.entries(this._config.addresses || {})) {
+      if (!groups.includes(group)) addresses[group] = setting;
+    }
+    if (Object.keys(addresses).length) config.addresses = addresses;
+    else delete config.addresses;
+
+    this._config = config;
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
+  }
+}
+
+if (!customElements.get("trash-containers-card-editor")) {
+  customElements.define("trash-containers-card-editor", TrashContainersCardEditor);
+}
 if (!customElements.get("trash-containers-card")) {
   customElements.define("trash-containers-card", TrashContainersCard);
 }
