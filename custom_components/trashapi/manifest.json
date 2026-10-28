@@ -1,10 +1,9 @@
 {
   "domain": "trashapi",
   "name": "HA Dutch Trash Calendar",
-  "after_dependencies": ["lovelace"],
+  "after_dependencies": ["frontend", "http", "lovelace"],
   "codeowners": ["@TheGinji"],
   "config_flow": true,
-  "dependencies": ["frontend", "http"],
   "documentation": "https://github.com/TheGinji/ha-dutch-trash-calendar",
   "integration_type": "service",
   "iot_class": "cloud_polling",
