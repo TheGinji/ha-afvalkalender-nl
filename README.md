@@ -205,6 +205,36 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
    **Resources**. Verwijder `/trashapi_static/trash-containers-card.js` daar zelf als je wilt.
    Eigen automatiseringen en helpers (zoals uit `docs/`) blijven staan en moet je zelf opruimen.
 
+## Kwaliteit
+
+Home Assistant beoordeelt integraties met de
+[kwaliteitsschaal](https://www.home-assistant.io/docs/quality_scale/) (Bronze, Silver, Gold en
+Platinum). Voor custom integrations zoals deze bestaat daar officieel **geen score** voor, dus dit
+project is **niet officieel erkend**. Het is wel gebouwd met de regels van **Bronze, Silver en Gold**
+in gedachte en daar zelf tegen getoetst. Regels die niet van toepassing zijn op een online dienst
+zonder apparaten (zoals het automatisch ontdekken van apparaten) zijn overgeslagen.
+
+Wat dat in de praktijk oplevert:
+
+- **Bronze, een degelijke basis:** instellen via de interface, het adres wordt gecontroleerd bij het
+  toevoegen, eenduidige entiteiten met een uniek ID en duidelijke documentatie.
+- **Silver, betrouwbaar in het dagelijks gebruik:** valt de API uit, dan worden de entiteiten netjes
+  "niet beschikbaar" en herstelt de integratie zichzelf, en een reparatiemelding laat zien wat er
+  aan de hand is. Bij elke wijziging draaien automatische tests (met minstens 95% dekking) en
+  de validatie van Home Assistant en HACS.
+- **Gold, de beste ervaring:** het adres is te wijzigen via Herconfigureren, de teksten zijn vertaald
+  (Nederlands en Engels), er is een diagnostics-download die je adres weglaat, en de documentatie
+  bevat voorbeelden, bekende beperkingen en probleemoplossing.
+
+**Platinum** (strikte typering van alle code) is niet gehaald.
+
 ## Licentie
 
 MIT
+
+## Credits
+
+- **Claude** (Anthropic): AI-assistent die samen met de eigenaar de integratie heeft ontworpen en
+  geschreven: code, dashboardkaart, vertalingen, tests en documentatie.
+- **OpenCode**, gekoppeld aan ChatGPT: AI-codeerassistent in Home Assistant zelf. Gebruikt om de code
+  te reviewen en de integratie in een echte installatie te testen.
