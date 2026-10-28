@@ -93,16 +93,16 @@ title: Afval
 ```
 
 Zonder verdere opties toont de kaart alle sensoren van de integratie, de eerstvolgende ophaling
-vooraan. De containers zijn grijs met een gekleurde deksel: restafval paars, gft groen, papier blauw
-(PMD oranje, glas turquoise, grofvuil bruin). Op de ophaaldag springt de container en heeft hij een
-gekleurde rand, de dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details.
-De kaart is zo hoog als zijn inhoud, ook bij meerdere rijen.
+vooraan. De containers zijn grijs met een gekleurde deksel; de kleuren stel je zelf in per afvalsoort
+(zie "Kleuren van de deksel"). Op de ophaaldag springt de container en heeft hij een gekleurde rand, de
+dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details. De kaart is zo
+hoog als zijn inhoud, ook bij meerdere rijen.
 
 Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. In de
 visuele editor kun je per adres de **naam** aanpassen (bijvoorbeeld "Thuis" in plaats van
 "Afvalkalender 1234AB 12") en het adres **aan of uit zetten**. Met "Kopje per adres tonen" zet je de
-kopjes helemaal uit. De visuele editor stelt titel, datum, volgorde, kopjes en adressen in; `entities`
-en `colors` stel je in YAML in.
+kopjes helemaal uit. De visuele editor stelt titel, datum, volgorde, kopjes, adressen en deksel-kleuren
+in; `entities` stel je in YAML in.
 
 | Optie | Uitleg | Standaard |
 |---|---|---|
@@ -112,7 +112,7 @@ en `colors` stel je in YAML in.
 | `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
 | `addresses` | Per adres een eigen `name` en `show: false` om het adres te verbergen | alle adressen, met de naam van het apparaat |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
-| `colors` | Deksel-kleur per afvalsoort | zie boven |
+| `colors` | Deksel-kleur per afvalsoort | zie "Kleuren van de deksel" |
 
 Voorbeeld met twee adressen, eigen namen en een verborgen adres:
 
@@ -143,6 +143,35 @@ entities:
 colors:
   restafval: "#8e44ad"
 ```
+
+### Kleuren van de deksel
+
+De kleuren van afvalcontainers verschillen **per gemeente**. Er is geen landelijke standaard, en de
+TrashAPI geeft geen kleuren door. De kaart begint daarom met een standaard die je aanpast aan jouw
+gemeente:
+
+| Soort | Standaard |
+|---|---|
+| Gft | groen |
+| Papier | blauw |
+| PMD en plastic | oranje |
+| Restafval | paars (bijvoorbeeld in veel Friese gemeenten; elders is restafval vaak grijs of zwart) |
+| Glas, textiel, grofvuil, kerstbomen | een eigen keuze zonder standaard: turquoise, geel, bruin en groen |
+| Andere soorten | grijsblauw |
+
+**Aanpassen in de visuele editor:** open het blok **Kleur van de deksel** en kies per afvalsoort een
+kleur uit de lijst, of "Standaard". De kleur geldt voor alle adressen.
+
+**Aanpassen in YAML:** gebruik `colors:` met de naam van de soort in kleine letters. Elke hex-kleur kan:
+
+```yaml
+colors:
+  restafval: "#6f767d"   # grijs
+  papier: "#1e78d6"
+```
+
+Wil je maar één container een andere kleur geven, gebruik dan `entities:` met `color:` (zie het
+voorbeeld hierboven).
 
 Zie je "Custom element doesn't exist"? Herstart Home Assistant en ververs de pagina hard
 (Ctrl/Cmd+Shift+R), of reset de frontend-cache in de app. Gebruik je een YAML-dashboard (`mode: yaml`),
@@ -201,8 +230,8 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
 - Er zijn alleen **datums, geen tijdstippen**. Rond de **jaarwisseling** kan het even duren voordat de
   nieuwe kalender beschikbaar is; de laatst bekende gegevens blijven dan zichtbaar.
 - Gegevens worden periodiek opgehaald; er zijn **geen directe updates**.
-- De kaart kent kleuren voor veelvoorkomende soorten. Onbekende soorten krijgen een neutrale kleur,
-  die je met `colors` kunt aanpassen.
+- De **deksel-kleuren** van de kaart zijn een standaard en kloppen niet voor elke gemeente. Pas ze aan
+  (zie "Kleuren van de deksel"). Soorten die de kaart niet kent krijgen een neutrale kleur.
 - Vanaf versie 1.5.0 worden de instellingen bij de eerste start automatisch omgezet naar een nieuw
   formaat (adres apart van de API-instellingen). **Terug naar een oudere versie** werkt daarna niet
   meer zonder de integratie opnieuw toe te voegen. Maak een back-up als je dat kunt willen.
