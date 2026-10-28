@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN
+from .const import ADDRESS_KEYS, DOMAIN, SETTING_KEYS
 from .coordinator import (
     ISSUE_API,
     ISSUE_NO_DATA,
@@ -31,6 +31,29 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         await async_register_card(hass)
     except Exception:  # noqa: BLE001
         _LOGGER.warning("Could not register the dashboard card", exc_info=True)
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: TrashApiConfigEntry) -> bool:
+    """Migrate old entries.
+
+    Version 1 stored all settings in entry.data and, after using "Configureren",
+    in entry.options as well (options won). Version 2 keeps the address in entry.data
+    (Herconfigureren) and the API settings in entry.options (Configureren).
+    """
+    if entry.version > 2:
+        return False  # created by a newer version: do not guess
+
+    if entry.version == 1:
+        merged = {**entry.data, **entry.options}
+        hass.config_entries.async_update_entry(
+            entry,
+            data={key: merged[key] for key in ADDRESS_KEYS if key in merged},
+            options={key: merged[key] for key in SETTING_KEYS if key in merged},
+            version=2,
+        )
+        _LOGGER.debug("Migrated config entry to version 2")
+
     return True
 
 
