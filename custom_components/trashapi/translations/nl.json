@@ -81,7 +81,7 @@
     },
     "no_data": {
       "title": "Geen ophaaldata gevonden",
-      "description": "De TrashAPI geeft op dit moment geen ophaaldata voor {address}. De laatst bekende gegevens blijven zichtbaar. Controleer via Configureren of plaats, postcode en huisnummer kloppen. Rond de jaarwisseling kan het even duren voordat de nieuwe kalender beschikbaar is."
+      "description": "De TrashAPI geeft op dit moment geen ophaaldata voor {address}. De laatst bekende gegevens blijven zichtbaar. Controleer via Herconfigureren of plaats, postcode en huisnummer kloppen. Rond de jaarwisseling kan het even duren voordat de nieuwe kalender beschikbaar is."
     }
   },
   "exceptions": {
