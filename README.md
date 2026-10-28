@@ -140,8 +140,8 @@ Het document legt ook uit hoe je ze toevoegt en welke namen (entity-ID's en tele
 - De ophaaldagen in de gedeelde gezinsagenda, door de agenda-entiteit te laten tonen of te
   synchroniseren.
 - Vragen aan Assist ("welke bak moet er morgen buiten?").
-- Lampen of een display die kleuren op de dag dat er iets wordt opgehaald, met de sensor
-  "Ophaling morgen" als trigger.
+- Een lamp of display die de avond ervoor een kleur toont, met de sensor "Ophaling morgen" als
+  trigger.
 
 ## Reparatiemeldingen
 
