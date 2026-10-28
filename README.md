@@ -84,7 +84,8 @@ Entiteiten. Komt de soort terug, dan wordt de sensor vanzelf opnieuw aangemaakt.
 
 De integratie levert zelf een kaart mee. Je hoeft niets te installeren of als resource toe te voegen:
 de integratie zet de kaart zelf bij Instellingen → Dashboards → Resources (bij dashboards in
-opslagmodus). Kies bij een nieuwe kaart **HA Dutch Trash Calendar**, of gebruik YAML:
+opslagmodus). Kies bij een nieuwe kaart **HA Dutch Trash Calendar** en stel hem in met de
+**visuele editor**, of gebruik YAML:
 
 ```yaml
 type: custom:trash-containers-card
@@ -95,10 +96,13 @@ Zonder verdere opties toont de kaart alle sensoren van de integratie, de eerstvo
 vooraan. De containers zijn grijs met een gekleurde deksel: restafval paars, gft groen, papier blauw
 (PMD oranje, glas turquoise, grofvuil bruin). Op de ophaaldag springt de container en heeft hij een
 gekleurde rand, de dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details.
+De kaart is zo hoog als zijn inhoud, ook bij meerdere rijen.
 
-Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. Wil je
-dat niet, zet dan `group_by_address: false`, of kies met `entities:` zelf welke containers de kaart
-laat zien. De kaart is zo hoog als zijn inhoud, ook bij meerdere rijen.
+Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. In de
+visuele editor kun je per adres de **naam** aanpassen (bijvoorbeeld "Thuis" in plaats van
+"Afvalkalender 1234AB 12") en het adres **aan of uit zetten**. Met "Kopje per adres tonen" zet je de
+kopjes helemaal uit. De visuele editor stelt titel, datum, volgorde, kopjes en adressen in; `entities`
+en `colors` stel je in YAML in.
 
 | Optie | Uitleg | Standaard |
 |---|---|---|
@@ -106,10 +110,25 @@ laat zien. De kaart is zo hoog als zijn inhoud, ook bij meerdere rijen.
 | `show_date` | Datum (bijv. "di 3 nov") onder het aantal dagen | `true` |
 | `sort` | Eerstvolgende ophaling vooraan | `true` |
 | `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
+| `addresses` | Per adres een eigen `name` en `show: false` om het adres te verbergen | alle adressen, met de naam van het apparaat |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
 | `colors` | Deksel-kleur per afvalsoort | zie boven |
 
-Voorbeeld met eigen volgorde, naam en kleur:
+Voorbeeld met twee adressen, eigen namen en een verborgen adres:
+
+```yaml
+type: custom:trash-containers-card
+title: Afval
+addresses:
+  Afvalkalender 1234AB 12:
+    name: Thuis
+  Afvalkalender 5678CD 3:
+    show: false
+```
+
+De sleutel onder `addresses` is de naam van het apparaat, zoals de visuele editor die toont.
+
+Voorbeeld met eigen volgorde, naam en kleur per container:
 
 ```yaml
 type: custom:trash-containers-card
