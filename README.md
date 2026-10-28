@@ -20,17 +20,21 @@ Vereist Home Assistant 2024.11 of nieuwer.
 
 ## Instellingen
 
-Alle parameters van de API zijn instelbaar, bij het toevoegen én later via de knop **Configureren**:
+Bij het toevoegen vul je het adres en de API-instellingen in. Daarna pas je ze apart aan:
 
-| Veld | API-parameter | Standaard |
-|---|---|---|
-| Plaats | `Location` | – |
-| Postcode | `ZipCode` | – |
-| Huisnummer | `HouseNumber` | – |
-| Hele jaar tonen | `ShowWholeYear` | aan |
-| Cleanprofs-data ophalen | `GetCleanprofsData` | aan |
-| Cache negeren | `IgnoreCache` | uit |
-| Verversen elke (uren) | – | 6 |
+- **Adres wijzigen** (bijvoorbeeld na een verhuizing): Instellingen → Apparaten & services →
+  HA Dutch Trash Calendar → menu met drie puntjes → **Herconfigureren**.
+- **API-instellingen**: de knop **Configureren**.
+
+| Veld | API-parameter | Standaard | Aan te passen via |
+|---|---|---|---|
+| Plaats | `Location` | – | Herconfigureren |
+| Postcode | `ZipCode` | – | Herconfigureren |
+| Huisnummer | `HouseNumber` | – | Herconfigureren |
+| Hele jaar tonen | `ShowWholeYear` | aan | Configureren |
+| Cleanprofs-data ophalen | `GetCleanprofsData` | aan | Configureren |
+| Cache negeren | `IgnoreCache` | uit | Configureren |
+| Verversen elke (uren) | – | 6 | Configureren |
 
 Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
 
@@ -163,14 +167,17 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
 - Gegevens worden periodiek opgehaald; er zijn **geen directe updates**.
 - De kaart kent kleuren voor veelvoorkomende soorten. Onbekende soorten krijgen een neutrale kleur,
   die je met `colors` kunt aanpassen.
+- Vanaf versie 1.5.0 worden de instellingen bij de eerste start automatisch omgezet naar een nieuw
+  formaat (adres apart van de API-instellingen). **Terug naar een oudere versie** werkt daarna niet
+  meer zonder de integratie opnieuw toe te voegen. Maak een back-up als je dat kunt willen.
 
 ## Probleemoplossing
 
 - **Sensoren zijn "niet beschikbaar".** Kijk onder Instellingen → Systeem → Reparaties en in het
   logboek (zoek op `trashapi`). Open de API in je browser om te zien of hij antwoordt:
   `https://trashapi.azurewebsites.net/Trash?Location=PLAATS&ZipCode=1234AB&HouseNumber=12&ShowWholeYear=true&GetCleanprofsData=true&IgnoreCache=false`
-- **"Geen ophaaldata gevonden" bij het toevoegen.** Controleer de postcode (zonder spatie), het
-  huisnummer en de plaatsnaam via de link hierboven.
+- **"Geen ophaaldata gevonden" bij het toevoegen of herconfigureren.** Controleer de postcode (zonder
+  spatie), het huisnummer en de plaatsnaam via de link hierboven.
 - **Een afvalsoort is weg of "niet beschikbaar".** Verwijder de oude sensor onder Instellingen →
   Entiteiten (zie "Entiteiten").
 - **De kaart toont een foutmelding.** Zie de tips bij "Dashboardkaart met containers".
