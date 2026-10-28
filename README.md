@@ -226,7 +226,18 @@ Wat dat in de praktijk oplevert:
   (Nederlands en Engels), er is een diagnostics-download die je adres weglaat, en de documentatie
   bevat voorbeelden, bekende beperkingen en probleemoplossing.
 
-**Platinum** (strikte typering van alle code) is niet gehaald.
+**Platinum is bewust niet nagestreefd.** Van de Platinum-regels ontbreekt alleen strikte typering:
+alle code volledig voorzien van type-annotaties en daarop gecontroleerd met `mypy`. Voor deze
+integratie levert dat te weinig op om de extra last te rechtvaardigen:
+
+- De code is klein en overzichtelijk, en de automatische tests controleren al het gedrag op de
+  plekken waar fouten het vaakst voorkomen.
+- De typecontrole draait tegen de nieuwste Home Assistant. Past Home Assistant zijn eigen typen aan,
+  dan kan de controle falen zonder dat er hier iets mis is. Dat kost onderhoud zonder dat het de
+  gebruiker iets oplevert.
+- Voor de gebruiker verandert er niets: strikte typering maakt de integratie niet betrouwbaarder,
+  sneller of makkelijker in gebruik. De winst die bij een integratie als deze telt, zit al in de
+  niveaus Bronze tot en met Gold.
 
 ## Licentie
 
