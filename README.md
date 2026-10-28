@@ -236,5 +236,5 @@ MIT
 
 - **Claude** (Anthropic): AI-assistent die samen met de eigenaar de integratie heeft ontworpen en
   geschreven: code, dashboardkaart, vertalingen, tests en documentatie.
-- **OpenCode**, gekoppeld aan ChatGPT: AI-codeerassistent in Home Assistant zelf. Gebruikt om de code
-  te reviewen en de integratie in een echte installatie te testen.
+- **OpenCode** met het model **Big Pickle**: AI-codeerassistent in Home Assistant zelf. Gebruikt om de
+  code te reviewen en de integratie in een echte installatie te testen.
