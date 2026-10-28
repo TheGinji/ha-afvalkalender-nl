@@ -13,15 +13,26 @@
           "ignore_cache": "Ignore API cache (IgnoreCache)",
           "scan_interval_hours": "Refresh every (hours)"
         }
+      },
+      "reconfigure": {
+        "title": "Change address",
+        "description": "Change the address the pickup dates are fetched for. Change the API settings via Configure.",
+        "data": {
+          "location": "City",
+          "zip_code": "Zip code",
+          "house_number": "House number"
+        }
       }
     },
     "error": {
       "cannot_connect": "Cannot reach TrashAPI.",
       "invalid_response": "The API returned an unexpected response.",
-      "no_data": "No pickup data found for this address."
+      "no_data": "No pickup data found for this address.",
+      "already_configured": "This address is already configured."
     },
     "abort": {
-      "already_configured": "This address is already configured."
+      "already_configured": "This address is already configured.",
+      "reconfigure_successful": "The address has been updated."
     }
   },
   "options": {
@@ -29,14 +40,12 @@
       "init": {
         "title": "Edit waste calendar",
         "data": {
-          "location": "City",
-          "zip_code": "Zip code",
-          "house_number": "House number",
           "show_whole_year": "Show whole year (ShowWholeYear)",
           "get_cleanprofs_data": "Get Cleanprofs data (GetCleanprofsData)",
           "ignore_cache": "Ignore API cache (IgnoreCache)",
           "scan_interval_hours": "Refresh every (hours)"
-        }
+        },
+        "description": "API settings. Change the address via Reconfigure."
       }
     },
     "error": {
