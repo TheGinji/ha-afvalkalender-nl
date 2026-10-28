@@ -5,6 +5,7 @@
  * Without options it shows every sensor of the integration. Options:
  *   title: Afval
  *   show_date: true          # small date under the countdown
+ *   group_by_address: true   # with several addresses: one heading per address
  *   sort: true               # soonest pickup first
  *   entities:                # limit / order the containers yourself
  *     - sensor.afvalkalender_1234ab_12_restafval
@@ -70,11 +71,13 @@ class TrashContainersCard extends HTMLElement {
   }
 
   getCardSize() {
-    return 3;
+    // Masonry view: roughly 4 units per row of containers, plus headings
+    return this._cardSize || 4;
   }
 
   getGridOptions() {
-    return { columns: 12, rows: 3, min_columns: 6, min_rows: 2 };
+    // "auto": the card is as tall as its content (several rows when there are many containers)
+    return { columns: 12, rows: "auto", min_columns: 6 };
   }
 
   static getStubConfig() {
@@ -112,9 +115,15 @@ class TrashContainersCard extends HTMLElement {
         const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
         dateLabel = d.toLocaleDateString(lang, { weekday: "short", day: "numeric", month: "short" });
       }
+      const friendly = String(a.friendly_name || "");
+      const group =
+        a.waste_type && friendly.endsWith(a.waste_type)
+          ? friendly.slice(0, friendly.length - a.waste_type.length).trim()
+          : "";
       items.push({
         id: opts.entity,
         type,
+        group,
         days,
         text: a.days_text || (days === null ? "–" : String(days)),
         dateLabel,
@@ -128,27 +137,51 @@ class TrashContainersCard extends HTMLElement {
   _render() {
     if (!this._config || !this._hass) return;
     const items = this._items();
-    const sig = JSON.stringify([items, this._config.title]);
+    const sig = JSON.stringify([items, this._config.title, this._config.group_by_address]);
     if (sig === this._sig) return;
     this._sig = sig;
 
-    const cards = items
-      .map((i) => {
-        const cls = i.days === 0 ? "today" : i.days === 1 ? "tomorrow" : i.days === null ? "none" : "";
-        return `
+    const renderItem = (i) => {
+      const cls = i.days === 0 ? "today" : i.days === 1 ? "tomorrow" : i.days === null ? "none" : "";
+      return `
         <div class="item ${cls}" data-entity="${escapeHtml(i.id)}" style="--lid:${escapeHtml(i.color)}">
           ${binSvg(i.color)}
           <div class="type">${escapeHtml(i.type)}</div>
           <div class="when">${escapeHtml(i.text)}</div>
           ${i.dateLabel ? `<div class="date">${escapeHtml(i.dateLabel)}</div>` : ""}
         </div>`;
-      })
-      .join("");
+    };
+
+    // With several addresses: one heading per address, in a fixed (alphabetical) order
+    const groups = [...new Set(items.map((i) => i.group))].sort((x, y) => x.localeCompare(y));
+    const showHeadings = this._config.group_by_address !== false && groups.length > 1;
+
+    let body;
+    let rows = 0;
+    if (!items.length) {
+      body = '<div class="empty">Geen afvalsensoren gevonden</div>';
+      rows = 1;
+    } else if (showHeadings) {
+      body = groups
+        .map((g) => {
+          const own = items.filter((i) => i.group === g);
+          rows += 1 + Math.ceil(own.length / 4);
+          return `<div class="group">${escapeHtml(g || "Overig")}</div><div class="row">${own.map(renderItem).join("")}</div>`;
+        })
+        .join("");
+    } else {
+      rows = Math.ceil(items.length / 4);
+      body = `<div class="row">${items.map(renderItem).join("")}</div>`;
+    }
+    this._cardSize = (this._config.title ? 1 : 0) + Math.max(1, rows) * 4;
 
     this.shadowRoot.innerHTML = `
       <style>
         ha-card { padding: 16px; }
         .title { font-size: 1.15rem; font-weight: 600; margin: 0 0 12px 4px; color: var(--primary-text-color); }
+        .group { font-size: .85rem; font-weight: 600; letter-spacing: .02em; margin: 10px 4px 6px;
+                 color: var(--secondary-text-color); }
+        .group:first-of-type { margin-top: 0; }
         .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-around; }
         .item { flex: 1 1 0; min-width: 78px; max-width: 150px; display: flex; flex-direction: column;
                 align-items: center; text-align: center; padding: 10px 6px 8px; cursor: pointer;
@@ -168,7 +201,7 @@ class TrashContainersCard extends HTMLElement {
       </style>
       <ha-card>
         ${this._config.title ? `<div class="title">${escapeHtml(this._config.title)}</div>` : ""}
-        <div class="row">${cards || '<div class="empty">Geen afvalsensoren gevonden</div>'}</div>
+        ${body}
       </ha-card>`;
 
     this.shadowRoot.querySelectorAll(".item").forEach((el) =>
