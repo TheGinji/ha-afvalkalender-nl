@@ -10,6 +10,16 @@ CONF_GET_CLEANPROFS_DATA = "get_cleanprofs_data"
 CONF_IGNORE_CACHE = "ignore_cache"
 CONF_SCAN_INTERVAL_HOURS = "scan_interval_hours"
 
+# Address = identity of the entry (changed via "Herconfigureren"),
+# settings = behaviour (changed via "Configureren")
+ADDRESS_KEYS = (CONF_LOCATION, CONF_ZIP_CODE, CONF_HOUSE_NUMBER)
+SETTING_KEYS = (
+    CONF_SHOW_WHOLE_YEAR,
+    CONF_GET_CLEANPROFS_DATA,
+    CONF_IGNORE_CACHE,
+    CONF_SCAN_INTERVAL_HOURS,
+)
+
 DEFAULT_SHOW_WHOLE_YEAR = True
 DEFAULT_GET_CLEANPROFS_DATA = True
 DEFAULT_IGNORE_CACHE = False
