@@ -36,7 +36,19 @@ Bij het toevoegen vul je het adres en de API-instellingen in. Daarna pas je ze a
 | Cache negeren | `IgnoreCache` | uit | Configureren |
 | Verversen elke (uren) | – | 6 | Configureren |
 
-Meerdere adressen? Voeg de integratie gewoon nog een keer toe.
+### Meerdere adressen
+
+Voeg de integratie gewoon nog een keer toe (Instellingen → Apparaten & services → **Dienst
+toevoegen**). Elk adres krijgt een eigen apparaat met eigen sensoren en een eigen agenda. Hetzelfde
+adres twee keer toevoegen kan niet.
+
+Let op bij het gebruik:
+
+- **De dashboardkaart** laat alle adressen zien, elk onder een eigen kopje (zie hieronder).
+- **Automatiseringen** verwijzen naar de entity-ID's van één adres. Voor een tweede adres maak je dus
+  een eigen kopie met de entity-ID's van dat adres.
+- **Assist "per soort"** (uit `docs/`) zoekt over alle adressen en geeft de laatste treffer. Met twee
+  adressen kan het antwoord dus bij het andere adres horen.
 
 ## Entiteiten
 
@@ -84,11 +96,16 @@ vooraan. De containers zijn grijs met een gekleurde deksel: restafval paars, gft
 (PMD oranje, glas turquoise, grofvuil bruin). Op de ophaaldag springt de container en heeft hij een
 gekleurde rand, de dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details.
 
+Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. Wil je
+dat niet, zet dan `group_by_address: false`, of kies met `entities:` zelf welke containers de kaart
+laat zien. De kaart is zo hoog als zijn inhoud, ook bij meerdere rijen.
+
 | Optie | Uitleg | Standaard |
 |---|---|---|
 | `title` | Titel boven de kaart | geen |
 | `show_date` | Datum (bijv. "di 3 nov") onder het aantal dagen | `true` |
 | `sort` | Eerstvolgende ophaling vooraan | `true` |
+| `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
 | `colors` | Deksel-kleur per afvalsoort | zie boven |
 
