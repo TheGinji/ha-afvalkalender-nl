@@ -99,10 +99,14 @@ dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de de
 hoog als zijn inhoud, ook bij meerdere rijen.
 
 Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. In de
-visuele editor kun je per adres de **naam** aanpassen (bijvoorbeeld "Thuis" in plaats van
-"Afvalkalender 1234AB 12") en het adres **aan of uit zetten**. Met "Kopje per adres tonen" zet je de
-kopjes helemaal uit. De visuele editor stelt titel, datum, volgorde, kopjes, adressen en deksel-kleuren
-in; `entities` stel je in YAML in.
+visuele editor heeft elk adres een eigen blok waarin je:
+- de **naam** van het kopje aanpast (bijvoorbeeld "Thuis" in plaats van "Afvalkalender 1234AB 12");
+- het **hele adres** aan of uit zet;
+- per **afvalsoort** aan of uit zet wat dat adres laat zien. Heb je bij een adres geen gft, of alleen
+  papier, dan zet je de rest uit.
+
+Met "Kopje per adres tonen" zet je de kopjes helemaal uit. De visuele editor stelt titel, datum,
+volgorde, kopjes, adressen, afvalsoorten per adres en deksel-kleuren in; `entities` stel je in YAML in.
 
 | Optie | Uitleg | Standaard |
 |---|---|---|
@@ -110,11 +114,12 @@ in; `entities` stel je in YAML in.
 | `show_date` | Datum (bijv. "di 3 nov") onder het aantal dagen | `true` |
 | `sort` | Eerstvolgende ophaling vooraan | `true` |
 | `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
-| `addresses` | Per adres een eigen `name` en `show: false` om het adres te verbergen | alle adressen, met de naam van het apparaat |
+| `addresses` | Per adres: eigen `name`, `show: false` om het adres te verbergen en `hide: [gft]` om afvalsoorten alleen bij dat adres te verbergen | alle adressen en soorten, met de naam van het apparaat |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
 | `colors` | Deksel-kleur per afvalsoort | zie "Kleuren van de deksel" |
 
-Voorbeeld met twee adressen, eigen namen en een verborgen adres:
+Voorbeeld met twee adressen: het eerste krijgt een eigen naam en geen gft, het tweede laat alleen
+papier zien:
 
 ```yaml
 type: custom:trash-containers-card
@@ -122,11 +127,15 @@ title: Afval
 addresses:
   Afvalkalender 1234AB 12:
     name: Thuis
+    hide: [gft]
   Afvalkalender 5678CD 3:
-    show: false
+    name: Voortuin
+    hide: [restafval, gft]
 ```
 
-De sleutel onder `addresses` is de naam van het apparaat, zoals de visuele editor die toont.
+De sleutel onder `addresses` is de naam van het apparaat, zoals de visuele editor die toont. Bij `hide`
+gebruik je de naam van de afvalsoort in kleine letters. Zet je alles van alle adressen uit, dan zegt de
+kaart dat er geen afvalsensoren zijn.
 
 Voorbeeld met eigen volgorde, naam en kleur per container:
 
@@ -232,6 +241,8 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
 - Gegevens worden periodiek opgehaald; er zijn **geen directe updates**.
 - De **deksel-kleuren** van de kaart zijn een standaard en kloppen niet voor elke gemeente. Pas ze aan
   (zie "Kleuren van de deksel"). Soorten die de kaart niet kent krijgen een neutrale kleur.
+- Afvalsoorten die je op de kaart uitzet (`hide`) blijven als sensor bestaan; alleen de kaart laat ze
+  niet zien. Voor de sensoren zelf geldt: verwijder ze onder Entiteiten als je ze niet wilt.
 - Vanaf versie 1.5.0 worden de instellingen bij de eerste start automatisch omgezet naar een nieuw
   formaat (adres apart van de API-instellingen). **Terug naar een oudere versie** werkt daarna niet
   meer zonder de integratie opnieuw toe te voegen. Maak een back-up als je dat kunt willen.
