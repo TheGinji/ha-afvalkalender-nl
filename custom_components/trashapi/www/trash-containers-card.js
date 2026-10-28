@@ -27,11 +27,32 @@ const DEFAULT_COLORS = {
   pmd: "#f28c28",
   plastic: "#f28c28",
   glas: "#16a085",
-  textiel: "#d4a017",
+  textiel: "#e2b100",
   grofvuil: "#8d6e63",
   kerstbo: "#2e7d32",
 };
 const FALLBACK_COLOR = "#607d8b";
+
+// Lid colours offered in the visual editor (any other hex colour still works in YAML)
+const LID_COLORS = [
+  { value: "#8e44ad", nl: "🟣 Paars", en: "🟣 Purple" },
+  { value: "#2e9e4f", nl: "🟢 Groen", en: "🟢 Green" },
+  { value: "#1e78d6", nl: "🔵 Blauw", en: "🔵 Blue" },
+  { value: "#f28c28", nl: "🟠 Oranje", en: "🟠 Orange" },
+  { value: "#d93a3a", nl: "🔴 Rood", en: "🔴 Red" },
+  { value: "#e2b100", nl: "🟡 Geel", en: "🟡 Yellow" },
+  { value: "#8d6e63", nl: "🟤 Bruin", en: "🟤 Brown" },
+  { value: "#16a085", nl: "Turquoise", en: "Turquoise" },
+  { value: "#6f767d", nl: "Grijs", en: "Grey" },
+  { value: "#2b2b2b", nl: "⚫ Zwart", en: "⚫ Black" },
+  { value: "#f2f2f2", nl: "⚪ Wit", en: "⚪ White" },
+];
+
+const defaultColorFor = (type) => {
+  const key = String(type || "").toLowerCase();
+  for (const [k, v] of Object.entries(DEFAULT_COLORS)) if (key.includes(k)) return v;
+  return FALLBACK_COLOR;
+};
 
 const binSvg = (lid) => `
 <svg viewBox="0 0 64 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -245,6 +266,9 @@ const EDITOR_TEXT = {
     group_by_address: "Kopje per adres tonen",
     name: (g) => `Naam voor ${g}`,
     show: (g) => `${g} tonen`,
+    colors: "Kleur van de deksel",
+    color: (type) => `Deksel ${type}`,
+    default: "Standaard",
   },
   en: {
     title: "Title",
@@ -253,6 +277,9 @@ const EDITOR_TEXT = {
     group_by_address: "Show a heading per address",
     name: (g) => `Name for ${g}`,
     show: (g) => `Show ${g}`,
+    colors: "Lid colour",
+    color: (type) => `Lid ${type}`,
+    default: "Default",
   },
 };
 
@@ -293,7 +320,29 @@ class TrashContainersCardEditor extends HTMLElement {
     return [...found].sort((x, y) => x.localeCompare(y));
   }
 
-  _schema(groups) {
+  // Waste types in the data (e.g. Restafval), keyed by their lower-case name as used in `colors:`
+  _types() {
+    const hass = this._hass;
+    const found = new Map();
+    for (const id of candidateIds(hass, this._config)) {
+      const type = hass.states[id]?.attributes?.waste_type;
+      if (type) found.set(String(type).toLowerCase(), String(type));
+    }
+    return [...found].map(([key, label]) => ({ key, label })).sort((x, y) => x.label.localeCompare(y.label));
+  }
+
+  _colorOptions(type) {
+    const t = this._text();
+    const nl = t === EDITOR_TEXT.nl;
+    const known = LID_COLORS.find((c) => c.value === defaultColorFor(type.label));
+    const options = [{ value: "", label: known ? `${t.default} (${known[nl ? "nl" : "en"]})` : t.default }];
+    for (const color of LID_COLORS) options.push({ value: color.value, label: color[nl ? "nl" : "en"] });
+    const current = (this._config.colors || {})[type.key];
+    if (current && !LID_COLORS.some((c) => c.value === current)) options.push({ value: current, label: current });
+    return options;
+  }
+
+  _schema(groups, types) {
     return [
       { name: "title", selector: { text: {} } },
       {
@@ -314,10 +363,23 @@ class TrashContainersCardEditor extends HTMLElement {
           { name: `show_${i}`, selector: { boolean: {} } },
         ],
       })),
+      ...(types.length
+        ? [
+            {
+              type: "expandable",
+              name: "",
+              title: this._text().colors,
+              schema: types.map((type, j) => ({
+                name: `color_${j}`,
+                selector: { select: { mode: "dropdown", options: this._colorOptions(type) } },
+              })),
+            },
+          ]
+        : []),
     ];
   }
 
-  _data(groups) {
+  _data(groups, types) {
     const c = this._config;
     const data = {
       title: c.title || "",
@@ -330,38 +392,44 @@ class TrashContainersCardEditor extends HTMLElement {
       data[`name_${i}`] = address.name || "";
       data[`show_${i}`] = address.show !== false;
     });
+    types.forEach((type, j) => {
+      data[`color_${j}`] = (c.colors || {})[type.key] || "";
+    });
     return data;
   }
 
   _sync(refreshData) {
     if (!this._config || !this._hass) return;
     const groups = this._groups();
+    const types = this._types();
     if (!this._form) {
       this._form = document.createElement("ha-form");
       this._form.addEventListener("value-changed", (ev) => this._changed(ev));
       this.shadowRoot.append(this._form);
     }
-    const key = JSON.stringify([groups, this._text() === EDITOR_TEXT.nl]);
+    const key = JSON.stringify([groups, types, this._text() === EDITOR_TEXT.nl, this._config.colors || {}]);
     if (key !== this._key) {
       this._key = key;
       const t = this._text();
-      this._form.schema = this._schema(groups);
+      this._form.schema = this._schema(groups, types);
       this._form.computeLabel = (schema) => {
         const name = schema.name || "";
-        const address = /^(name|show)_(\d+)$/.exec(name);
-        if (address) return t[address[1]](groups[Number(address[2])]);
+        const item = /^(name|show|color)_(\d+)$/.exec(name);
+        if (item && item[1] === "color") return t.color(types[Number(item[2])].label);
+        if (item) return t[item[1]](groups[Number(item[2])]);
         return t[name] || schema.title || "";
       };
       refreshData = true;
     }
     this._form.hass = this._hass;
-    if (refreshData) this._form.data = this._data(groups);
+    if (refreshData) this._form.data = this._data(groups, types);
   }
 
   _changed(ev) {
     ev.stopPropagation();
     const value = ev.detail.value || {};
     const groups = this._groups();
+    const types = this._types();
     const config = { ...this._config };
 
     // Only store what differs from the defaults, so the YAML stays short
@@ -384,6 +452,16 @@ class TrashContainersCardEditor extends HTMLElement {
     }
     if (Object.keys(addresses).length) config.addresses = addresses;
     else delete config.addresses;
+
+    // Lid colours per waste type; entries for other types are kept untouched
+    const colors = { ...(this._config.colors || {}) };
+    types.forEach((type, j) => {
+      const picked = String(value[`color_${j}`] || "");
+      if (picked) colors[type.key] = picked;
+      else delete colors[type.key];
+    });
+    if (Object.keys(colors).length) config.colors = colors;
+    else delete config.colors;
 
     this._config = config;
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
