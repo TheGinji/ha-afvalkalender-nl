@@ -13,15 +13,26 @@
           "ignore_cache": "Cache van de API negeren (IgnoreCache)",
           "scan_interval_hours": "Verversen elke (uren)"
         }
+      },
+      "reconfigure": {
+        "title": "Adres wijzigen",
+        "description": "Pas het adres aan waarvoor de ophaaldata worden opgehaald. De API-instellingen wijzig je via Configureren.",
+        "data": {
+          "location": "Plaats",
+          "zip_code": "Postcode",
+          "house_number": "Huisnummer"
+        }
       }
     },
     "error": {
       "cannot_connect": "Kan de TrashAPI niet bereiken.",
       "invalid_response": "De API gaf een onverwacht antwoord.",
-      "no_data": "Geen ophaaldata gevonden voor dit adres."
+      "no_data": "Geen ophaaldata gevonden voor dit adres.",
+      "already_configured": "Dit adres is al toegevoegd."
     },
     "abort": {
-      "already_configured": "Dit adres is al toegevoegd."
+      "already_configured": "Dit adres is al toegevoegd.",
+      "reconfigure_successful": "Het adres is bijgewerkt."
     }
   },
   "options": {
@@ -29,14 +40,12 @@
       "init": {
         "title": "Afvalkalender aanpassen",
         "data": {
-          "location": "Plaats",
-          "zip_code": "Postcode",
-          "house_number": "Huisnummer",
           "show_whole_year": "Hele jaar tonen (ShowWholeYear)",
           "get_cleanprofs_data": "Cleanprofs-data ophalen (GetCleanprofsData)",
           "ignore_cache": "Cache van de API negeren (IgnoreCache)",
           "scan_interval_hours": "Verversen elke (uren)"
-        }
+        },
+        "description": "Instellingen van de API. Het adres wijzig je via Herconfigureren."
       }
     },
     "error": {
