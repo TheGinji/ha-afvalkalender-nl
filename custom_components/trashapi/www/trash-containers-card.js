@@ -10,6 +10,7 @@
  *     "Afvalkalender 1234AB 12":
  *       name: Thuis          # heading to show instead of the device name
  *       show: false          # hide this address
+ *       hide: [gft]          # hide these waste types at this address only
  *   sort: true               # soonest pickup first
  *   entities:                # limit / order the containers yourself
  *     - sensor.afvalkalender_1234ab_12_restafval
@@ -81,6 +82,10 @@ const addressOf = (attrs) => {
     ? friendly.slice(0, friendly.length - attrs.waste_type.length).trim()
     : "";
 };
+
+const typeKey = (type) => String(type || "").toLowerCase();
+
+const isHidden = (address, type) => (address.hide || []).some((h) => typeKey(h) === typeKey(type));
 
 const candidateIds = (hass, config) =>
   config.entities && config.entities.length
@@ -160,6 +165,7 @@ class TrashContainersCard extends HTMLElement {
       const group = addressOf(a);
       const address = (this._config.addresses || {})[group] || {};
       if (address.show === false) continue;
+      if (a.waste_type && isHidden(address, a.waste_type)) continue;
       items.push({
         id: opts.entity,
         type,
@@ -265,7 +271,8 @@ const EDITOR_TEXT = {
     sort: "Eerstvolgende ophaling vooraan",
     group_by_address: "Kopje per adres tonen",
     name: (g) => `Naam voor ${g}`,
-    show: (g) => `${g} tonen`,
+    show: () => "Adres tonen",
+    type: (type) => `${type} tonen`,
     colors: "Kleur van de deksel",
     color: (type) => `Deksel ${type}`,
     default: "Standaard",
@@ -276,7 +283,8 @@ const EDITOR_TEXT = {
     sort: "Soonest pickup first",
     group_by_address: "Show a heading per address",
     name: (g) => `Name for ${g}`,
-    show: (g) => `Show ${g}`,
+    show: () => "Show address",
+    type: (type) => `Show ${type}`,
     colors: "Lid colour",
     color: (type) => `Lid ${type}`,
     default: "Default",
@@ -320,6 +328,22 @@ class TrashContainersCardEditor extends HTMLElement {
     return [...found].sort((x, y) => x.localeCompare(y));
   }
 
+  // Waste types per address (same order as `groups`), for the per-address on/off switches
+  _groupTypes(groups) {
+    const hass = this._hass;
+    const map = new Map(groups.map((g) => [g, new Map()]));
+    for (const id of candidateIds(hass, this._config)) {
+      const attrs = hass.states[id]?.attributes || {};
+      const group = addressOf(attrs);
+      if (!group || !attrs.waste_type) continue;
+      if (!map.has(group)) map.set(group, new Map());
+      map.get(group).set(typeKey(attrs.waste_type), String(attrs.waste_type));
+    }
+    return groups.map((g) =>
+      [...(map.get(g) || [])].map(([key, label]) => ({ key, label })).sort((x, y) => x.label.localeCompare(y.label))
+    );
+  }
+
   // Waste types in the data (e.g. Restafval), keyed by their lower-case name as used in `colors:`
   _types() {
     const hass = this._hass;
@@ -342,7 +366,7 @@ class TrashContainersCardEditor extends HTMLElement {
     return options;
   }
 
-  _schema(groups, types) {
+  _schema(groups, types, groupTypes) {
     return [
       { name: "title", selector: { text: {} } },
       {
@@ -361,6 +385,7 @@ class TrashContainersCardEditor extends HTMLElement {
         schema: [
           { name: `name_${i}`, selector: { text: {} } },
           { name: `show_${i}`, selector: { boolean: {} } },
+          ...groupTypes[i].map((type, j) => ({ name: `type_${i}_${j}`, selector: { boolean: {} } })),
         ],
       })),
       ...(types.length
@@ -379,7 +404,7 @@ class TrashContainersCardEditor extends HTMLElement {
     ];
   }
 
-  _data(groups, types) {
+  _data(groups, types, groupTypes) {
     const c = this._config;
     const data = {
       title: c.title || "",
@@ -391,6 +416,9 @@ class TrashContainersCardEditor extends HTMLElement {
       const address = (c.addresses || {})[group] || {};
       data[`name_${i}`] = address.name || "";
       data[`show_${i}`] = address.show !== false;
+      groupTypes[i].forEach((type, j) => {
+        data[`type_${i}_${j}`] = !isHidden(address, type.key);
+      });
     });
     types.forEach((type, j) => {
       data[`color_${j}`] = (c.colors || {})[type.key] || "";
@@ -402,18 +430,21 @@ class TrashContainersCardEditor extends HTMLElement {
     if (!this._config || !this._hass) return;
     const groups = this._groups();
     const types = this._types();
+    const groupTypes = this._groupTypes(groups);
     if (!this._form) {
       this._form = document.createElement("ha-form");
       this._form.addEventListener("value-changed", (ev) => this._changed(ev));
       this.shadowRoot.append(this._form);
     }
-    const key = JSON.stringify([groups, types, this._text() === EDITOR_TEXT.nl, this._config.colors || {}]);
+    const key = JSON.stringify([groups, types, groupTypes, this._text() === EDITOR_TEXT.nl, this._config.colors || {}]);
     if (key !== this._key) {
       this._key = key;
       const t = this._text();
-      this._form.schema = this._schema(groups, types);
+      this._form.schema = this._schema(groups, types, groupTypes);
       this._form.computeLabel = (schema) => {
         const name = schema.name || "";
+        const typeSwitch = /^type_(\d+)_(\d+)$/.exec(name);
+        if (typeSwitch) return t.type(groupTypes[Number(typeSwitch[1])][Number(typeSwitch[2])].label);
         const item = /^(name|show|color)_(\d+)$/.exec(name);
         if (item && item[1] === "color") return t.color(types[Number(item[2])].label);
         if (item) return t[item[1]](groups[Number(item[2])]);
@@ -422,7 +453,7 @@ class TrashContainersCardEditor extends HTMLElement {
       refreshData = true;
     }
     this._form.hass = this._hass;
-    if (refreshData) this._form.data = this._data(groups, types);
+    if (refreshData) this._form.data = this._data(groups, types, groupTypes);
   }
 
   _changed(ev) {
@@ -430,6 +461,7 @@ class TrashContainersCardEditor extends HTMLElement {
     const value = ev.detail.value || {};
     const groups = this._groups();
     const types = this._types();
+    const groupTypes = this._groupTypes(groups);
     const config = { ...this._config };
 
     // Only store what differs from the defaults, so the YAML stays short
@@ -444,7 +476,19 @@ class TrashContainersCardEditor extends HTMLElement {
     groups.forEach((group, i) => {
       const name = String(value[`name_${i}`] || "").trim();
       const visible = value[`show_${i}`] !== false;
-      if (name || !visible) addresses[group] = { ...(name ? { name } : {}), ...(visible ? {} : { show: false }) };
+      // Keep hidden types that are not in the data right now, add the ones switched off
+      const known = new Set(groupTypes[i].map((type) => type.key));
+      const hide = ((this._config.addresses || {})[group]?.hide || []).map(typeKey).filter((key) => !known.has(key));
+      groupTypes[i].forEach((type, j) => {
+        if (value[`type_${i}_${j}`] === false) hide.push(type.key);
+      });
+      if (name || !visible || hide.length) {
+        addresses[group] = {
+          ...(name ? { name } : {}),
+          ...(visible ? {} : { show: false }),
+          ...(hide.length ? { hide } : {}),
+        };
+      }
     });
     // Keep settings of addresses that are not available right now
     for (const [group, setting] of Object.entries(this._config.addresses || {})) {
