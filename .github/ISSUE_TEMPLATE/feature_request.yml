@@ -1,0 +1,39 @@
+name: Idee of wens
+description: Een nieuwe functie of verbetering voorstellen
+title: "[Idee] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fijn dat je meedenkt. Beschrijf vooral **wat je wilt bereiken**, niet alleen hoe het zou moeten werken.
+
+        De integratie kan alleen laten zien wat de TrashAPI teruggeeft. Voor ideeën over andere afvalinzamelaars of ander land: dat ligt aan de bron.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Waar gaat het over?
+      options:
+        - Sensoren of agenda
+        - Dashboardkaart of visuele editor
+        - Knop of verversen
+        - Meldingen of Assist (docs)
+        - Documentatie
+        - Anders
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Wat wil je bereiken?
+      description: Bijvoorbeeld "ik wil op mijn wandpaneel zien welke bak er morgen buiten moet".
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Heb je een idee hoe het zou kunnen?
+      description: Mag leeg blijven.
