@@ -411,6 +411,13 @@ integratie levert dat te weinig op om de extra last te rechtvaardigen:
   sneller of makkelijker in gebruik. De winst die bij een integratie als deze telt, zit al in de
   niveaus Bronze tot en met Gold.
 
+## Steun
+
+Afvalkalender NL is gratis en open source. Heb je er plezier van, dan is een kopje koffie welkom, maar
+nooit verplicht.
+
+[![Steun me op Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/theginji)
+
 ## Licentie
 
 MIT
