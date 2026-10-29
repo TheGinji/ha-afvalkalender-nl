@@ -1,4 +1,4 @@
-/* HA Dutch Trash Calendar - dashboard card with container icons.
+/* Afvalkalender NL - dashboard card with container icons.
  *
  *   type: custom:trash-containers-card
  *
@@ -522,7 +522,7 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some((c) => c.type === "trash-containers-card")) {
   window.customCards.push({
     type: "trash-containers-card",
-    name: "HA Dutch Trash Calendar",
+    name: "Afvalkalender NL",
     description: "Afvalcontainers met gekleurde deksels en het aantal dagen tot de ophaling",
   });
 }
