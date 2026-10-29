@@ -58,6 +58,9 @@
     "sensor": {
       "next_pickup": {
         "name": "Next pickup"
+      },
+      "last_update": {
+        "name": "Last updated"
       }
     },
     "binary_sensor": {
@@ -71,6 +74,11 @@
     "calendar": {
       "pickup_calendar": {
         "name": "Pickup days"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh now"
       }
     }
   },
