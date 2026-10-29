@@ -61,6 +61,11 @@ Let op bij het gebruik:
   opgehaald. Attributen: `waste_types`, `waste_types_text`. Handig voor automatiseringen en badges.
 - **Ophaaldagen** (agenda): alle ophaaldagen als hele-dag-afspraken, zichtbaar in de Home
   Assistant-agenda en bruikbaar als trigger voor automatiseringen.
+- **Nu verversen** (knop): haalt de kalender direct opnieuw op en slaat daarbij de cache van de API
+  over. De knop blijft bruikbaar als de API even niet bereikbaar was.
+- **Laatst bijgewerkt** (sensor, diagnostisch): het tijdstip van de laatste geslaagde update. Deze
+  sensor staat **standaard uit**; zet hem aan onder Instellingen → Apparaten & services → Entiteiten
+  als je hem wilt zien. Na een mislukte update blijft hij het laatste succes tonen.
 
 `days_text` is een leesbare tekst: `Vandaag`, `Morgen` of `Over 4 dagen` (Engels als Home Assistant
 niet op Nederlands staat: `Today`, `Tomorrow`, `In 4 days`).
@@ -77,8 +82,9 @@ Entiteiten. Komt de soort terug, dan wordt de sensor vanzelf opnieuw aangemaakt.
   van 1 tot 48 uur via **Configureren**). Dat is voldoende, want ophaaldagen veranderen zelden.
 - De sensoren, binary sensors en de agenda springen **elke nacht kort na 00:00** vanzelf door naar
   de volgende datum, zonder nieuwe API-aanroep. "Morgen" wordt dus vanzelf "Vandaag".
-- Direct verversen kan met de actie `homeassistant.update_entity` op een van de sensoren van de
-  integratie. Met de optie **Cache negeren** vraag je de API om haar eigen cache over te slaan.
+- Direct verversen kan met de knop **Nu verversen**. Die vraagt de API om haar eigen cache over te
+  slaan, ook als je de optie **Cache negeren** uit hebt staan. Voor automatiseringen kan ook de actie
+  `button.press` op die knop, of `homeassistant.update_entity` op een van de sensoren.
 
 ## Dashboardkaart met containers
 
@@ -238,7 +244,8 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
   de API ze levert.
 - Er zijn alleen **datums, geen tijdstippen**. Rond de **jaarwisseling** kan het even duren voordat de
   nieuwe kalender beschikbaar is; de laatst bekende gegevens blijven dan zichtbaar.
-- Gegevens worden periodiek opgehaald; er zijn **geen directe updates**.
+- Gegevens worden periodiek opgehaald; er zijn **geen directe updates**. Met de knop **Nu verversen**
+  haal je ze op wanneer je wilt.
 - De **deksel-kleuren** van de kaart zijn een standaard en kloppen niet voor elke gemeente. Pas ze aan
   (zie "Kleuren van de deksel"). Soorten die de kaart niet kent krijgen een neutrale kleur.
 - Afvalsoorten die je op de kaart uitzet (`hide`) blijven als sensor bestaan; alleen de kaart laat ze
@@ -252,6 +259,8 @@ De meldingen verdwijnen vanzelf zodra de API weer werkt.
 - **Sensoren zijn "niet beschikbaar".** Kijk onder Instellingen → Systeem → Reparaties en in het
   logboek (zoek op `trashapi`). Open de API in je browser om te zien of hij antwoordt:
   `https://trashapi.azurewebsites.net/Trash?Location=PLAATS&ZipCode=1234AB&HouseNumber=12&ShowWholeYear=true&GetCleanprofsData=true&IgnoreCache=false`
+  Antwoordt de API weer, druk dan op **Nu verversen**; dan hoef je niet op de volgende automatische
+  update te wachten.
 - **"Geen ophaaldata gevonden" bij het toevoegen of herconfigureren.** Controleer de postcode (zonder
   spatie), het huisnummer en de plaatsnaam via de link hierboven.
 - **Een afvalsoort is weg of "niet beschikbaar".** Verwijder de oude sensor onder Instellingen →
