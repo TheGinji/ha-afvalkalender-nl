@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -45,7 +46,9 @@ async def async_setup_entry(
             known.update(new)
             async_add_entities(TrashTypeSensor(coordinator, entry, n) for n in new)
 
-    async_add_entities([NextPickupSensor(coordinator, entry)])
+    async_add_entities(
+        [NextPickupSensor(coordinator, entry), LastUpdateSensor(coordinator, entry)]
+    )
     _add_new_types()
     # A new waste type (e.g. Grofvuil) may show up later in the calendar
     entry.async_on_unload(coordinator.async_add_listener(_add_new_types))
@@ -170,3 +173,25 @@ class NextPickupSensor(TrashBaseSensor):
             "waste_types": types,
             "waste_types_text": ", ".join(types),
         }
+
+
+class LastUpdateSensor(TrashBaseSensor):
+    """When the calendar was last fetched successfully (hidden by default)."""
+
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_entity_registry_enabled_default = False
+    _attr_translation_key = "last_update"
+
+    def __init__(self, coordinator: TrashApiCoordinator, entry: TrashApiConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_last_update"
+
+    @property
+    def available(self) -> bool:
+        # Keep showing the last success after a failed update: that is the useful information
+        return True
+
+    @property
+    def native_value(self) -> datetime | None:
+        return self.coordinator.last_success
