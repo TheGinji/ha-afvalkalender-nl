@@ -417,6 +417,15 @@ MIT
 
 ## Credits
 
+- **TrashAPI** ([trashapi.azurewebsites.net](https://trashapi.azurewebsites.net)), gemaakt door
+  **Johnny Visser**. Alle ophaaldata komen van deze API. Zonder haar bestaat Afvalkalender NL niet.
+- **Inspiratie:** de andere afvalintegraties voor Home Assistant, met dank aan hun makers:
+  [Afvalbeheer](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer),
+  [Afvalwijzer](https://github.com/xirixiz/homeassistant-afvalwijzer),
+  [Waste Collection Schedule](https://github.com/mampfes/hacs_waste_collection_schedule),
+  [HVC Groep](https://github.com/cyberjunky/home-assistant-hvcgroep) en
+  [Rad Afval](https://github.com/johnwulp/rad-afval), en alle andere projecten die de afvalkalender
+  naar Home Assistant brengen. Er is geen code van deze projecten gebruikt.
 - **Claude** (Anthropic): AI-assistent die samen met de eigenaar de integratie heeft ontworpen en
   geschreven: code, dashboardkaart, vertalingen, tests en documentatie.
 - **OpenCode** met het model **Big Pickle**: AI-codeerassistent in Home Assistant zelf. Gebruikt om de
