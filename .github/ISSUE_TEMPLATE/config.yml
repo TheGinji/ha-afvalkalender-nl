@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Werkt mijn adres met deze integratie?
+    url: https://github.com/TheGinji/ha-afvalkalender-nl#is-dit-de-juiste-integratie-voor-jou
+    about: Test eerst de TrashAPI met jouw adres. Staat het daar niet in, dan kan de integratie het ook niet ophalen.
