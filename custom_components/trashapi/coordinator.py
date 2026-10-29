@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -10,11 +10,13 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .api import TrashApiError, async_fetch_pickups
 from .const import (
     API_DOCS_URL,
     CONF_HOUSE_NUMBER,
+    CONF_IGNORE_CACHE,
     CONF_SCAN_INTERVAL_HOURS,
     CONF_ZIP_CODE,
     DEFAULT_SCAN_INTERVAL_HOURS,
@@ -56,6 +58,8 @@ class TrashApiCoordinator(DataUpdateCoordinator[dict[str, list[date]]]):
         )
         self._session = async_get_clientsession(hass)
         self._failures = 0
+        self._bypass_cache = False
+        self.last_success: datetime | None = None
 
     @callback
     def _raise_issue(self, key: str, **placeholders: str) -> None:
@@ -75,9 +79,18 @@ class TrashApiCoordinator(DataUpdateCoordinator[dict[str, list[date]]]):
     def _clear_issue(self, key: str) -> None:
         ir.async_delete_issue(self.hass, DOMAIN, issue_id(key, self.config_entry.entry_id))
 
-    async def _async_update_data(self) -> dict[str, list[date]]:
+    async def async_refresh_now(self) -> None:
+        """Fetch now and skip the cache of the API (used by the refresh button)."""
+        self._bypass_cache = True
         try:
-            data = await async_fetch_pickups(self._session, self.config)
+            await self.async_refresh()
+        finally:
+            self._bypass_cache = False
+
+    async def _async_update_data(self) -> dict[str, list[date]]:
+        config = {**self.config, CONF_IGNORE_CACHE: True} if self._bypass_cache else self.config
+        try:
+            data = await async_fetch_pickups(self._session, config)
         except TrashApiError as err:
             self._failures += 1
             if self._failures >= FAILURES_BEFORE_ISSUE:
@@ -89,6 +102,7 @@ class TrashApiCoordinator(DataUpdateCoordinator[dict[str, list[date]]]):
             ) from err
 
         self._failures = 0
+        self.last_success = dt_util.utcnow()
         self._clear_issue(ISSUE_API)
 
         if not data:
