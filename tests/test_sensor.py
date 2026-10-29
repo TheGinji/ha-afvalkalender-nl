@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from datetime import date
 
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.trashapi.api import TrashApiConnectionError
+from custom_components.trashapi.const import DOMAIN
 
 from .common import PICKUPS, entity_id
 
@@ -122,3 +125,47 @@ async def test_sensors_are_unavailable_when_the_api_fails(
     await entry.runtime_data.async_refresh()
     await hass.async_block_till_done()
     assert hass.states.get(entity_id(hass, "sensor", entry, "gft")).state == "2026-10-27"
+
+
+async def test_last_update_sensor_is_hidden_by_default(
+    hass: HomeAssistant, init_integration
+) -> None:
+    registry = er.async_get(hass)
+    entry = registry.async_get(entity_id(hass, "sensor", init_integration, "last_update"))
+    assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
+    assert entry.entity_category is EntityCategory.DIAGNOSTIC
+
+
+async def test_last_update_sensor_shows_the_last_success(
+    hass: HomeAssistant, config_entry, mock_fetch, mock_card, freezer
+) -> None:
+    await hass.config.async_set_time_zone("UTC")
+    freezer.move_to("2026-10-26 12:00:00+00:00")
+    config_entry.add_to_hass(hass)
+    # Enable the (by default hidden) sensor before the integration is set up
+    er.async_get(hass).async_get_or_create(
+        "sensor",
+        DOMAIN,
+        f"{config_entry.entry_id}_last_update",
+        config_entry=config_entry,
+        disabled_by=None,
+    )
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    sensor = entity_id(hass, "sensor", config_entry, "last_update")
+    state = hass.states.get(sensor)
+    assert state.state == "2026-10-26T12:00:00+00:00"
+    assert state.attributes["device_class"] == "timestamp"
+
+    # A failed update keeps the time of the last success, and the sensor stays available
+    freezer.move_to("2026-10-26 13:00:00+00:00")
+    mock_fetch.side_effect = TrashApiConnectionError("down")
+    await config_entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert hass.states.get(sensor).state == "2026-10-26T12:00:00+00:00"
+
+    mock_fetch.side_effect = None
+    await config_entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert hass.states.get(sensor).state == "2026-10-26T13:00:00+00:00"
