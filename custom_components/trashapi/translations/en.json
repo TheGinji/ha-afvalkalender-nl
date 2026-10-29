@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "HA Dutch Trash Calendar",
+        "title": "Afvalkalender NL",
         "description": "Enter the address to fetch the pickup dates for.",
         "data": {
           "location": "City",
