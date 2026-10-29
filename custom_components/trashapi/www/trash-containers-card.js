@@ -9,6 +9,7 @@
  *   addresses:               # per address (the key is the address as shown in the editor)
  *     "Afvalkalender 1234AB 12":
  *       name: Thuis          # heading to show instead of the device name
+ *       order: 1             # position of this address (1 = top); without it: alphabetical
  *       show: false          # hide this address
  *       hide: [gft]          # hide these waste types at this address only
  *   sort: true               # soonest pickup first
@@ -199,9 +200,16 @@ class TrashContainersCard extends HTMLElement {
         </div>`;
     };
 
-    // With several addresses: one heading per address, in a fixed (alphabetical) order
+    // With several addresses: one heading per address
     const labels = new Map(items.map((i) => [i.group, i.groupLabel]));
-    const groups = [...labels.keys()].sort((x, y) => labels.get(x).localeCompare(labels.get(y)));
+    // Addresses with an `order` come first (1 = top); the rest follows alphabetically
+    const orderOf = (g) => {
+      const o = Number((this._config.addresses || {})[g]?.order);
+      return Number.isFinite(o) && o > 0 ? o : Infinity;
+    };
+    const groups = [...labels.keys()].sort(
+      (x, y) => orderOf(x) - orderOf(y) || labels.get(x).localeCompare(labels.get(y))
+    );
     const renamed = items.some((i) => (this._config.addresses || {})[i.group]?.name);
     const showHeadings = this._config.group_by_address !== false && (groups.length > 1 || renamed);
 
@@ -271,6 +279,7 @@ const EDITOR_TEXT = {
     sort: "Eerstvolgende ophaling vooraan",
     group_by_address: "Kopje per adres tonen",
     name: (g) => `Naam voor ${g}`,
+    order: () => "Volgorde (1 = bovenaan)",
     show: () => "Adres tonen",
     type: (type) => `${type} tonen`,
     colors: "Kleur van de deksel",
@@ -283,6 +292,7 @@ const EDITOR_TEXT = {
     sort: "Soonest pickup first",
     group_by_address: "Show a heading per address",
     name: (g) => `Name for ${g}`,
+    order: () => "Order (1 = top)",
     show: () => "Show address",
     type: (type) => `Show ${type}`,
     colors: "Lid colour",
@@ -384,6 +394,7 @@ class TrashContainersCardEditor extends HTMLElement {
         title: group,
         schema: [
           { name: `name_${i}`, selector: { text: {} } },
+          { name: `order_${i}`, selector: { number: { min: 1, max: 99, step: 1, mode: "box" } } },
           { name: `show_${i}`, selector: { boolean: {} } },
           ...groupTypes[i].map((type, j) => ({ name: `type_${i}_${j}`, selector: { boolean: {} } })),
         ],
@@ -415,6 +426,7 @@ class TrashContainersCardEditor extends HTMLElement {
     groups.forEach((group, i) => {
       const address = (c.addresses || {})[group] || {};
       data[`name_${i}`] = address.name || "";
+      if (address.order) data[`order_${i}`] = address.order;
       data[`show_${i}`] = address.show !== false;
       groupTypes[i].forEach((type, j) => {
         data[`type_${i}_${j}`] = !isHidden(address, type.key);
@@ -445,7 +457,7 @@ class TrashContainersCardEditor extends HTMLElement {
         const name = schema.name || "";
         const typeSwitch = /^type_(\d+)_(\d+)$/.exec(name);
         if (typeSwitch) return t.type(groupTypes[Number(typeSwitch[1])][Number(typeSwitch[2])].label);
-        const item = /^(name|show|color)_(\d+)$/.exec(name);
+        const item = /^(name|order|show|color)_(\d+)$/.exec(name);
         if (item && item[1] === "color") return t.color(types[Number(item[2])].label);
         if (item) return t[item[1]](groups[Number(item[2])]);
         return t[name] || schema.title || "";
@@ -476,15 +488,18 @@ class TrashContainersCardEditor extends HTMLElement {
     groups.forEach((group, i) => {
       const name = String(value[`name_${i}`] || "").trim();
       const visible = value[`show_${i}`] !== false;
+      const rawOrder = Number(value[`order_${i}`]);
+      const order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.round(rawOrder) : null;
       // Keep hidden types that are not in the data right now, add the ones switched off
       const known = new Set(groupTypes[i].map((type) => type.key));
       const hide = ((this._config.addresses || {})[group]?.hide || []).map(typeKey).filter((key) => !known.has(key));
       groupTypes[i].forEach((type, j) => {
         if (value[`type_${i}_${j}`] === false) hide.push(type.key);
       });
-      if (name || !visible || hide.length) {
+      if (name || order || !visible || hide.length) {
         addresses[group] = {
           ...(name ? { name } : {}),
+          ...(order ? { order } : {}),
           ...(visible ? {} : { show: false }),
           ...(hide.length ? { hide } : {}),
         };
