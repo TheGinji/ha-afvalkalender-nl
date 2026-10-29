@@ -1,6 +1,6 @@
 # Afval: meldingen met bevestiging + Assist-vragen
 
-Voorbeeldconfiguratie voor **HA Dutch Trash Calendar**. Bestaat uit één helper en vijf
+Voorbeeldconfiguratie voor **Afvalkalender NL**. Bestaat uit één helper en vijf
 automatiseringen: drie voor pushmeldingen met de knop "Container buiten gezet" en twee
 voor vragen aan Assist.
 
