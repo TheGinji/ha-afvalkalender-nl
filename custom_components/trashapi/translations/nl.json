@@ -58,6 +58,9 @@
     "sensor": {
       "next_pickup": {
         "name": "Volgende ophaling"
+      },
+      "last_update": {
+        "name": "Laatst bijgewerkt"
       }
     },
     "binary_sensor": {
@@ -71,6 +74,11 @@
     "calendar": {
       "pickup_calendar": {
         "name": "Ophaaldagen"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Nu verversen"
       }
     }
   },
