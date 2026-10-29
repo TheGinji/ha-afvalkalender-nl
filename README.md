@@ -16,7 +16,7 @@ Je vult alleen je plaats, postcode en huisnummer in. De gegevens komen van de
 [TrashAPI](https://trashapi.azurewebsites.net).
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/kaart-vandaag.gif" alt="De dashboardkaart met containers. De container van vandaag springt." width="420">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/social-preview.png" alt="Afvalkalender NL: de afvalkalender voor Home Assistant, met een dashboardkaart met containers" width="100%">
 </p>
 
 *English: Afvalkalender NL is a Home Assistant custom integration (HACS) for Dutch waste collection
@@ -157,6 +157,11 @@ vooraan. De containers zijn grijs met een gekleurde deksel; de kleuren stel je z
 (zie "Kleuren van de deksel"). Op de ophaaldag springt de container en heeft hij een gekleurde rand, de
 dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details. De kaart is zo
 hoog als zijn inhoud, ook bij meerdere rijen.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/kaart-vandaag.gif" alt="De dashboardkaart met containers. De container van vandaag springt." width="420"><br>
+  <sub>De container van vandaag springt</sub>
+</p>
 
 <table>
   <tr>
