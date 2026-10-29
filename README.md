@@ -27,8 +27,8 @@ card with a visual editor, a refresh button and support for several addresses. N
   automatiseringen, en een **knop "Nu verversen"**.
 - **Een dashboardkaart met containers** in gekleurde deksels, met een visuele editor. Op de
   ophaaldag springt de container.
-- **Meerdere adressen**, elk met eigen sensoren, een eigen kopje op de kaart en eigen keuzes welke
-  afvalsoorten je ziet.
+- **Meerdere adressen**, elk met eigen sensoren, een eigen kopje op de kaart, een eigen plek in de
+  volgorde en eigen keuzes welke afvalsoorten je ziet.
 - **Meldingen en Assist**: een pushmelding de avond ervoor met de knop "Container buiten gezet" en
   vragen als "welke bak moet er morgen buiten?" (kant-en-klare voorbeelden).
 - **Reparatiemeldingen en diagnostics** als de API niet werkt, in het Nederlands en Engels.
@@ -148,6 +148,8 @@ hoog als zijn inhoud, ook bij meerdere rijen.
 Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. In de
 visuele editor heeft elk adres een eigen blok waarin je:
 - de **naam** van het kopje aanpast (bijvoorbeeld "Thuis" in plaats van "Afvalkalender 1234AB 12");
+- de **volgorde** bepaalt: het adres met nummer 1 staat bovenaan. Adressen zonder nummer staan daarna
+  op alfabet van hun naam;
 - het **hele adres** aan of uit zet;
 - per **afvalsoort** aan of uit zet wat dat adres laat zien. Heb je bij een adres geen gft, of alleen
   papier, dan zet je de rest uit.
@@ -161,11 +163,11 @@ volgorde, kopjes, adressen, afvalsoorten per adres en deksel-kleuren in; `entiti
 | `show_date` | Datum (bijv. "di 3 nov") onder het aantal dagen | `true` |
 | `sort` | Eerstvolgende ophaling vooraan | `true` |
 | `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
-| `addresses` | Per adres: eigen `name`, `show: false` om het adres te verbergen en `hide: [gft]` om afvalsoorten alleen bij dat adres te verbergen | alle adressen en soorten, met de naam van het apparaat |
+| `addresses` | Per adres: eigen `name`, `order: 1` voor de plek op de kaart (1 = bovenaan), `show: false` om het adres te verbergen en `hide: [gft]` om afvalsoorten alleen bij dat adres te verbergen | alle adressen en soorten, op alfabet, met de naam van het apparaat |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
 | `colors` | Deksel-kleur per afvalsoort | zie "Kleuren van de deksel" |
 
-Voorbeeld met twee adressen: het eerste krijgt een eigen naam en geen gft, het tweede laat alleen
+Voorbeeld met twee adressen: het eerste staat bovenaan en heeft geen gft, het tweede laat alleen
 papier zien:
 
 ```yaml
@@ -174,15 +176,17 @@ title: Afval
 addresses:
   Afvalkalender 1234AB 12:
     name: Thuis
+    order: 1
     hide: [gft]
   Afvalkalender 5678CD 3:
     name: Voortuin
+    order: 2
     hide: [restafval, gft]
 ```
 
 De sleutel onder `addresses` is de naam van het apparaat, zoals de visuele editor die toont. Bij `hide`
 gebruik je de naam van de afvalsoort in kleine letters. Zet je alles van alle adressen uit, dan zegt de
-kaart dat er geen afvalsensoren zijn.
+kaart dat er geen afvalsensoren zijn. Hebben twee adressen hetzelfde nummer, dan beslist het alfabet.
 
 Voorbeeld met eigen volgorde, naam en kleur per container:
 
