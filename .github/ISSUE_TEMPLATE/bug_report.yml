@@ -1,0 +1,81 @@
+name: Foutmelding
+description: Iets werkt niet zoals het zou moeten
+title: "[Fout] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bedankt voor je melding. Controleer eerst of de API met jouw adres antwoordt (zie de README, onder **Probleemoplossing**). Staat jouw adres niet in de API, dan ligt het aan de bron en niet aan de integratie.
+
+        **Zet geen postcode of huisnummer in deze melding.** De diagnostics-download laat die automatisch weg.
+
+  - type: input
+    id: version
+    attributes:
+      label: Versie van Afvalkalender NL
+      description: Zie HACS, of Instellingen → Apparaten & services → Afvalkalender NL.
+      placeholder: bijvoorbeeld 1.10.1
+    validations:
+      required: true
+
+  - type: input
+    id: ha_version
+    attributes:
+      label: Versie van Home Assistant
+      description: Instellingen → Over.
+      placeholder: bijvoorbeeld 2026.10.3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Waar gaat het over?
+      options:
+        - Sensoren
+        - Agenda
+        - Ophaling vandaag/morgen
+        - Knop "Nu verversen"
+        - Dashboardkaart
+        - Visuele editor van de kaart
+        - Toevoegen, herconfigureren of instellingen
+        - Meldingen of Assist (docs)
+        - Anders
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api
+    attributes:
+      label: Antwoordt de API met jouw adres?
+      description: Open de link uit de README (Probleemoplossing) in je browser met je eigen gegevens.
+      options:
+        - Ja, ik krijg ophaaldata terug
+        - Nee, de lijst is leeg of er is een fout
+        - Dat heb ik niet getest
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: Wat gebeurt er?
+      description: En wat had je verwacht? Een screenshot mag ook.
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostische gegevens
+      description: |
+        Instellingen → Apparaten & services → Afvalkalender NL → menu met drie puntjes → **Diagnostische gegevens downloaden**.
+        Sleep het bestand in dit veld, of plak de inhoud. Plaats, postcode en huisnummer worden daarin weggelaten.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logboek
+      description: Zoek in het logboek op `trashapi` en plak de regels hier.
+      render: text
