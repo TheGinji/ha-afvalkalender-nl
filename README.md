@@ -15,6 +15,10 @@ moet: restafval, gft, papier, pmd en meer, als sensoren, agenda en een dashboard
 Je vult alleen je plaats, postcode en huisnummer in. De gegevens komen van de
 [TrashAPI](https://trashapi.azurewebsites.net).
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/kaart-vandaag.gif" alt="De dashboardkaart met containers. De container van vandaag springt." width="420">
+</p>
+
 *English: Afvalkalender NL is a Home Assistant custom integration (HACS) for Dutch waste collection
 calendars. It gives you sensors per waste type, a calendar, "pickup today/tomorrow" sensors, a dashboard
 card with a visual editor, a refresh button and support for several addresses. Netherlands only.*
@@ -108,6 +112,15 @@ adres twee keer toevoegen kan niet.
   sensor staat **standaard uit**; zet hem aan onder Instellingen → Apparaten & services → Entiteiten
   als je hem wilt zien. Na een mislukte update blijft hij het laatste succes tonen.
 
+De sensoren van twee adressen, getoond in gewone entiteitenkaarten van Home Assistant:
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3050.jpeg" alt="De sensoren van het adres Thuis" width="100%"><br><sub>Thuis</sub></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3051.jpeg" alt="De sensoren van het adres Camping huisje" width="100%"><br><sub>Camping huisje</sub></td>
+  </tr>
+</table>
+
 `days_text` is een leesbare tekst: `Vandaag`, `Morgen` of `Over 4 dagen` (Engels als Home Assistant
 niet op Nederlands staat: `Today`, `Tomorrow`, `In 4 days`).
 
@@ -145,6 +158,13 @@ vooraan. De containers zijn grijs met een gekleurde deksel; de kleuren stel je z
 dag ervoor krijgt hij een gekleurde achtergrond. Tik op een container voor de details. De kaart is zo
 hoog als zijn inhoud, ook bij meerdere rijen.
 
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3047.jpeg" alt="De kaart met twee adressen, met datums" width="100%"><br><sub>Twee adressen, met datum</sub></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3048.jpeg" alt="Dezelfde kaart zonder datums" width="100%"><br><sub>Dezelfde kaart met "Datum tonen" uit</sub></td>
+  </tr>
+</table>
+
 Heb je **meer dan één adres**, dan krijgt elk adres een eigen kopje boven zijn containers. In de
 visuele editor heeft elk adres een eigen blok waarin je:
 - de **naam** van het kopje aanpast (bijvoorbeeld "Thuis" in plaats van "Afvalkalender 1234AB 12");
@@ -156,6 +176,13 @@ visuele editor heeft elk adres een eigen blok waarin je:
 
 Met "Kopje per adres tonen" zet je de kopjes helemaal uit. De visuele editor stelt titel, datum,
 volgorde, kopjes, adressen, afvalsoorten per adres en deksel-kleuren in; `entities` stel je in YAML in.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3063.jpeg" alt="De bovenkant van de editor met titel en schakelaars" width="100%"><br><sub>De editor: titel en schakelaars, daaronder een blok per adres</sub></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3064.jpeg" alt="Het blok van één adres met naam, volgorde en schakelaars per afvalsoort" width="100%"><br><sub>Per adres: naam, volgorde en wat je laat zien</sub></td>
+  </tr>
+</table>
 
 | Optie | Uitleg | Standaard |
 |---|---|---|
@@ -222,6 +249,13 @@ gemeente:
 **Aanpassen in de visuele editor:** open het blok **Kleur van de deksel** en kies per afvalsoort een
 kleur uit de lijst, of "Standaard". De kleur geldt voor alle adressen.
 
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3065.jpeg" alt="De keuzelijst met kleuren voor de deksel van restafval" width="100%"><br><sub>Per afvalsoort een kleur kiezen</sub></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3066.jpeg" alt="Het voorbeeld van de kaart in de editor" width="100%"><br><sub>Het voorbeeld onderin laat meteen het resultaat zien</sub></td>
+  </tr>
+</table>
+
 **Aanpassen in YAML:** gebruik `colors:` met de naam van de soort in kleine letters. Elke hex-kleur kan:
 
 ```yaml
@@ -251,6 +285,10 @@ entity: sensor.afvalkalender_postcode_huisnummer_restafval
 state_content: days_text
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3049.jpeg" alt="Badges met de volgende ophaaldatum en het aantal dagen per afvalsoort" width="640">
+</p>
+
 ## Meldingen en Assist
 
 Kant-en-klare voorbeelden staan in [docs/afval-automatiseringen.md](docs/afval-automatiseringen.md):
@@ -262,6 +300,16 @@ Kant-en-klare voorbeelden staan in [docs/afval-automatiseringen.md](docs/afval-a
 Het document legt ook uit hoe je ze toevoegt en welke namen (entity-ID's en telefoons) je moet aanpassen.
 Andere ideeën: een lamp of display die de avond ervoor een kleur toont, met de sensor "Ophaling morgen"
 als trigger, of de ophaaldagen in de gezinsagenda.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3067.jpeg" alt="De herinnering op de telefoon: Container nog niet buiten" width="560"><br>
+  <sub>De herinnering om 06:45</sub>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheGinji/ha-afvalkalender-nl/main/docs/images/IMG_3068.jpeg" alt="De melding met de knop Container buiten gezet" width="560"><br>
+  <sub>Houd de melding ingedrukt voor de knop "Container buiten gezet"</sub>
+</p>
 
 ## Probleemoplossing
 
