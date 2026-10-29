@@ -1,13 +1,13 @@
 {
   "domain": "trashapi",
-  "name": "HA Dutch Trash Calendar",
+  "name": "Afvalkalender NL",
   "after_dependencies": ["frontend", "http", "lovelace"],
   "codeowners": ["@TheGinji"],
   "config_flow": true,
-  "documentation": "https://github.com/TheGinji/ha-dutch-trash-calendar",
+  "documentation": "https://github.com/TheGinji/ha-afvalkalender-nl",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/TheGinji/ha-dutch-trash-calendar/issues",
+  "issue_tracker": "https://github.com/TheGinji/ha-afvalkalender-nl/issues",
   "requirements": [],
-  "version": "1.10.0"
+  "version": "1.10.1"
 }
