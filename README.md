@@ -5,8 +5,9 @@
 [![Release](https://img.shields.io/github/v/release/TheGinji/ha-afvalkalender-nl)](https://github.com/TheGinji/ha-afvalkalender-nl/releases)
 [![Tests](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/tests.yaml/badge.svg)](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/tests.yaml)
 [![Validate](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/validate.yaml/badge.svg)](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/validate.yaml)
-[![Licentie: MIT](https://img.shields.io/badge/licentie-MIT-blue.svg)](LICENSE)
+[![Licentie](https://img.shields.io/github/license/TheGinji/ha-afvalkalender-nl)](LICENSE)
 [![Sterren](https://img.shields.io/github/stars/TheGinji/ha-afvalkalender-nl?style=flat)](https://github.com/TheGinji/ha-afvalkalender-nl/stargazers)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-steun%20mij-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/theginji)
 
 [![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=TheGinji&repository=ha-afvalkalender-nl&category=integration)
 
