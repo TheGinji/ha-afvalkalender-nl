@@ -17,8 +17,8 @@
  *     - sensor.afvalkalender_1234ab_12_restafval
  *     - entity: sensor.afvalkalender_1234ab_12_gft
  *       name: Groen
- *       color: "#2e9e4f"     # lid colour
- *   colors:                   # lid colour per waste type
+ *       color: "#2e9e4f"     # lid colour (hex colours only, e.g. #2e9e4f)
+ *   colors:                   # lid colour per waste type (hex colours only)
  *     restafval: "#8e44ad"
  */
 
@@ -34,6 +34,14 @@ const DEFAULT_COLORS = {
   kerstbo: "#2e7d32",
 };
 const FALLBACK_COLOR = "#607d8b";
+
+// Colours from the card config end up in the page, so only hex colours are accepted
+// (#rgb, #rgba, #rrggbb, #rrggbbaa). Anything else is ignored and the default colour is used.
+const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+const hexOrNull = (value) => {
+  const text = String(value ?? "").trim();
+  return HEX_COLOR.test(text) ? text : null;
+};
 
 // Lid colours offered in the visual editor (any other hex colour still works in YAML)
 const LID_COLORS = [
@@ -56,7 +64,9 @@ const defaultColorFor = (type) => {
   return FALLBACK_COLOR;
 };
 
-const binSvg = (lid) => `
+const binSvg = (colour) => {
+  const lid = escapeHtml(colour);
+  return `
 <svg viewBox="0 0 64 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <path d="M13 26h38l-4.2 49.2a4 4 0 0 1-4 3.6H21.2a4 4 0 0 1-4-3.6z" fill="#a9afb6"/>
   <path d="M13 26h8.5l3.3 52.8h-3.6a4 4 0 0 1-4-3.6z" fill="#9097a0"/>
@@ -72,6 +82,7 @@ const binSvg = (lid) => `
   <circle cx="21" cy="79" r="2" fill="#7b838c"/>
   <circle cx="43" cy="79" r="2" fill="#7b838c"/>
 </svg>`;
+};
 
 const isTrashSensor = (st) =>
   st && st.attributes && "days_until" in st.attributes && "upcoming_dates" in st.attributes;
@@ -133,12 +144,16 @@ class TrashContainersCard extends HTMLElement {
   }
 
   _color(type, override) {
-    if (override) return override;
+    const own = hexOrNull(override);
+    if (own) return own;
     const key = String(type || "").toLowerCase();
     const custom = this._config.colors || {};
-    for (const [k, v] of Object.entries(custom)) if (key.includes(k.toLowerCase())) return v;
-    for (const [k, v] of Object.entries(DEFAULT_COLORS)) if (key.includes(k)) return v;
-    return FALLBACK_COLOR;
+    for (const [k, v] of Object.entries(custom)) {
+      if (!key.includes(k.toLowerCase())) continue;
+      const colour = hexOrNull(v);
+      if (colour) return colour;
+    }
+    return defaultColorFor(type);
   }
 
   _items() {
@@ -372,7 +387,7 @@ class TrashContainersCardEditor extends HTMLElement {
     const options = [{ value: "", label: known ? `${t.default} (${known[nl ? "nl" : "en"]})` : t.default }];
     for (const color of LID_COLORS) options.push({ value: color.value, label: color[nl ? "nl" : "en"] });
     const current = (this._config.colors || {})[type.key];
-    if (current && !LID_COLORS.some((c) => c.value === current)) options.push({ value: current, label: current });
+    if (hexOrNull(current) && !LID_COLORS.some((c) => c.value === current)) options.push({ value: current, label: current });
     return options;
   }
 
