@@ -53,18 +53,21 @@ België is niet getest.
 
 ## Installeren via HACS
 
-1. Open HACS → menu (drie puntjes rechtsboven) → **Custom repositories**
-2. Repository: `https://github.com/TheGinji/ha-afvalkalender-nl`, type: **Integration** → **Add**
-3. Zoek "Afvalkalender NL" in HACS en kies **Download**
-4. Herstart Home Assistant
-5. Instellingen → Apparaten & services → Integratie toevoegen → **Afvalkalender NL**
+1. Zoek **Afvalkalender NL** in HACS en kies **Download**. Vanaf Home Assistant 2026.11 zit HACS in
+   Home Assistant zelf, onder de naam Marketplace.
+2. Herstart Home Assistant.
+3. Instellingen → Apparaten & services → Integratie toevoegen → **Afvalkalender NL**.
+
+*Vind je de integratie nog niet bij het zoeken?* Voeg dan eerst de repository toe: HACS → menu (drie
+puntjes rechtsboven) → **Custom repositories** → `https://github.com/TheGinji/ha-afvalkalender-nl`, type
+**Integration** → **Add**. Zoek hem daarna zoals hierboven.
 
 Handmatig kan ook: kopieer `custom_components/trashapi` naar `/config/custom_components/`.
 Vereist Home Assistant 2024.11 of nieuwer.
 
 *Eerder geïnstalleerd als "HA Dutch Trash Calendar"? Dat is dezelfde integratie met een nieuwe naam en
 repository. Je instellingen en entiteiten blijven bestaan. Verschijnt de update niet in HACS, voeg dan
-de nieuwe repository hierboven toe.*
+de nieuwe repository toe zoals hierboven.*
 
 ## Instellen
 
@@ -198,7 +201,7 @@ volgorde, kopjes, adressen, afvalsoorten per adres en deksel-kleuren in; `entiti
 | `group_by_address` | Bij meerdere adressen een kopje per adres | `true` |
 | `addresses` | Per adres: eigen `name`, `order: 1` voor de plek op de kaart (1 = bovenaan), `show: false` om het adres te verbergen en `hide: [gft]` om afvalsoorten alleen bij dat adres te verbergen | alle adressen en soorten, op alfabet, met de naam van het apparaat |
 | `entities` | Eigen lijst en volgorde van sensoren | alle sensoren |
-| `colors` | Deksel-kleur per afvalsoort | zie "Kleuren van de deksel" |
+| `colors` | Deksel-kleur per afvalsoort, als hex-kleur | zie "Kleuren van de deksel" |
 
 Voorbeeld met twee adressen: het eerste staat bovenaan en heeft geen gft, het tweede laat alleen
 papier zien:
@@ -262,7 +265,9 @@ kleur uit de lijst, of "Standaard". De kleur geldt voor alle adressen.
   </tr>
 </table>
 
-**Aanpassen in YAML:** gebruik `colors:` met de naam van de soort in kleine letters. Elke hex-kleur kan:
+**Aanpassen in YAML:** gebruik `colors:` met de naam van de soort in kleine letters en een **hex-kleur**
+(`#rgb` of `#rrggbb`, eventueel met doorzichtigheid). Andere waarden, zoals kleurnamen, worden
+genegeerd en dan geldt de standaardkleur van die soort.
 
 ```yaml
 colors:
@@ -270,8 +275,8 @@ colors:
   papier: "#1e78d6"
 ```
 
-Wil je maar één container een andere kleur geven, gebruik dan `entities:` met `color:` (zie het
-voorbeeld hierboven).
+Wil je maar één container een andere kleur geven, gebruik dan `entities:` met `color:` (ook een
+hex-kleur, zie het voorbeeld hierboven).
 
 Zie je "Custom element doesn't exist"? Herstart Home Assistant en ververs de pagina hard
 (Ctrl/Cmd+Shift+R), of reset de frontend-cache in de app. Gebruik je een YAML-dashboard (`mode: yaml`),
@@ -334,6 +339,8 @@ als trigger, of de ophaaldagen in de gezinsagenda.
 - **Een afvalsoort is weg of "niet beschikbaar".** Verwijder de oude sensor onder Instellingen →
   Entiteiten (zie "Entiteiten").
 - **De kaart toont een foutmelding.** Zie de tips bij "Dashboardkaart met containers".
+- **De deksel heeft niet de kleur die ik koos.** Controleer of het een hex-kleur is, zoals `#6f767d`.
+  Kleurnamen zoals `grey` worden genegeerd.
 - **Meer details in het logboek.** Zet dit in `configuration.yaml` en herstart:
 
   ```yaml
