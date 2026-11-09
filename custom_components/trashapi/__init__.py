@@ -1,4 +1,4 @@
-"""HA Dutch Trash Calendar integration."""
+"""Afvalkalender NL integration."""
 
 from __future__ import annotations
 
