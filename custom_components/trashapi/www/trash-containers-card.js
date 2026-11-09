@@ -87,13 +87,25 @@ const binSvg = (colour) => {
 const isTrashSensor = (st) =>
   st && st.attributes && "days_until" in st.attributes && "upcoming_dates" in st.attributes;
 
-// "Afvalkalender 1234AB 12 Gft" with waste type "Gft" -> "Afvalkalender 1234AB 12"
-const addressOf = (attrs) => {
+// Older fallback: "Afvalkalender 1234AB 12 Gft" with waste type "Gft" -> "Afvalkalender 1234AB 12".
+// Only used when the device registry is not available: the friendly_name attribute is planned
+// for deprecation and no longer matches once someone renames an entity.
+const addressFromName = (attrs) => {
   const friendly = String(attrs.friendly_name || "");
   return attrs.waste_type && friendly.endsWith(attrs.waste_type)
     ? friendly.slice(0, friendly.length - attrs.waste_type.length).trim()
     : "";
 };
+
+// The address is the device the sensor belongs to: take its name from the device registry
+const deviceNameOf = (hass, entityId) => {
+  const deviceId = hass?.entities?.[entityId]?.device_id;
+  const device = deviceId ? hass?.devices?.[deviceId] : undefined;
+  const name = device?.name_by_user || device?.name;
+  return name ? String(name) : "";
+};
+
+const addressOf = (hass, entityId, attrs) => deviceNameOf(hass, entityId) || addressFromName(attrs || {});
 
 const typeKey = (type) => String(type || "").toLowerCase();
 
@@ -178,7 +190,7 @@ class TrashContainersCard extends HTMLElement {
         const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
         dateLabel = d.toLocaleDateString(lang, { weekday: "short", day: "numeric", month: "short" });
       }
-      const group = addressOf(a);
+      const group = addressOf(hass, opts.entity, a);
       const address = (this._config.addresses || {})[group] || {};
       if (address.show === false) continue;
       if (a.waste_type && isHidden(address, a.waste_type)) continue;
@@ -346,7 +358,7 @@ class TrashContainersCardEditor extends HTMLElement {
     const found = new Set();
     for (const id of candidateIds(hass, this._config)) {
       const st = hass.states[id];
-      const group = st ? addressOf(st.attributes || {}) : "";
+      const group = st ? addressOf(hass, id, st.attributes) : "";
       if (group) found.add(group);
     }
     for (const group of Object.keys(this._config.addresses || {})) found.add(group);
@@ -359,7 +371,7 @@ class TrashContainersCardEditor extends HTMLElement {
     const map = new Map(groups.map((g) => [g, new Map()]));
     for (const id of candidateIds(hass, this._config)) {
       const attrs = hass.states[id]?.attributes || {};
-      const group = addressOf(attrs);
+      const group = addressOf(hass, id, attrs);
       if (!group || !attrs.waste_type) continue;
       if (!map.has(group)) map.set(group, new Map());
       map.get(group).set(typeKey(attrs.waste_type), String(attrs.waste_type));
