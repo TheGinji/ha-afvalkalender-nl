@@ -1,6 +1,6 @@
 # Afvalkalender NL
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![Home Assistant 2024.11+](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-41BDF5.svg)](https://www.home-assistant.io)
 [![Release](https://img.shields.io/github/v/release/TheGinji/ha-afvalkalender-nl)](https://github.com/TheGinji/ha-afvalkalender-nl/releases)
 [![Tests](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/tests.yaml/badge.svg)](https://github.com/TheGinji/ha-afvalkalender-nl/actions/workflows/tests.yaml)
@@ -58,8 +58,9 @@ België is niet getest.
 2. Herstart Home Assistant.
 3. Instellingen → Apparaten & services → Integratie toevoegen → **Afvalkalender NL**.
 
-*Vind je de integratie nog niet bij het zoeken?* Voeg dan eerst de repository toe: HACS → menu (drie
-puntjes rechtsboven) → **Custom repositories** → `https://github.com/TheGinji/ha-afvalkalender-nl`, type
+*Vind je de integratie nog niet bij het zoeken?* Een nieuwe toevoeging aan HACS kan er even over doen
+voordat hij overal in de lijst staat. Voeg dan eerst de repository toe: HACS → menu (drie puntjes
+rechtsboven) → **Custom repositories** → `https://github.com/TheGinji/ha-afvalkalender-nl`, type
 **Integration** → **Add**. Zoek hem daarna zoals hierboven.
 
 Handmatig kan ook: kopieer `custom_components/trashapi` naar `/config/custom_components/`.
