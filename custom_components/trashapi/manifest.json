@@ -2,6 +2,7 @@
   "domain": "trashapi",
   "name": "Afvalkalender NL",
   "after_dependencies": ["frontend", "http", "lovelace"],
+  "categories": ["local_services"],
   "codeowners": ["@TheGinji"],
   "config_flow": true,
   "documentation": "https://github.com/TheGinji/ha-afvalkalender-nl",
@@ -9,5 +10,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/TheGinji/ha-afvalkalender-nl/issues",
   "requirements": [],
-  "version": "1.11.3"
+  "version": "1.11.4"
 }
