@@ -335,6 +335,9 @@ als trigger, of de ophaaldagen in de gezinsagenda.
   `https://trashapi.azurewebsites.net/Trash?Location=PLAATS&ZipCode=1234AB&HouseNumber=12&ShowWholeYear=true&GetCleanprofsData=true&IgnoreCache=false`
   Antwoordt de API weer, druk dan op **Nu verversen**; dan hoef je niet op de volgende automatische
   update te wachten.
+- **"HTTP 403 Forbidden" in het logboek.** Dan weigert de TrashAPI zelf de aanvraag; het ligt niet aan
+  Home Assistant. Probeer het later nog eens met **Nu verversen**. Gebeurt het vaak, meld het dan zoals
+  hieronder, met het tijdstip erbij.
 - **"Geen ophaaldata gevonden" bij het toevoegen of herconfigureren.** Controleer de postcode (zonder
   spatie), het huisnummer en de plaatsnaam via de link hierboven.
 - **Een afvalsoort is weg of "niet beschikbaar".** Verwijder de oude sensor onder Instellingen →
@@ -355,6 +358,9 @@ als trigger, of de ophaaldagen in de gezinsagenda.
   services → Afvalkalender NL → menu met drie puntjes → **Diagnostische gegevens downloaden**.
   Plaats, postcode en huisnummer worden daarin automatisch weggelaten. Voeg het bestand toe aan je
   [melding op GitHub](https://github.com/TheGinji/ha-afvalkalender-nl/issues).
+  Foutmeldingen in het logboek en in reparatiemeldingen bevatten sinds versie 1.11.5 geen postcode en
+  huisnummer meer. Gebruik je een oudere versie, haal dan de regel met je adres uit het logboek voordat
+  je het deelt.
 
 ## Bekende beperkingen
 
@@ -385,6 +391,13 @@ als trigger, of de ophaaldagen in de gezinsagenda.
 3. Optioneel: de dashboardkaart staat nog als resource onder Instellingen → Dashboards → menu →
    **Resources**. Verwijder `/trashapi_static/trash-containers-card.js` daar zelf als je wilt.
    Eigen automatiseringen en helpers (zoals uit `docs/`) blijven staan en moet je zelf opruimen.
+
+## Getest
+
+Afvalkalender NL draait in een echte installatie op **Home Assistant Core 2026.11.3**, met versie
+**1.11.5** geïnstalleerd via de Marketplace (HACS). Na een herstart draait alles stabiel. Daarnaast
+draaien bij elke wijziging automatische tests en de validatie van Home Assistant en HACS (zie
+"Kwaliteit").
 
 ## Kwaliteit
 
