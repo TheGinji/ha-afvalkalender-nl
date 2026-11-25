@@ -81,7 +81,11 @@ def next_pickup(dates: list[date], today: date) -> date | None:
 async def async_fetch_pickups(
     session: aiohttp.ClientSession, config: Mapping[str, Any]
 ) -> dict[str, list[date]]:
-    """Call the API and return the parsed pickups."""
+    """Call the API and return the parsed pickups.
+
+    The error messages end up in the log and in repair issues, so they must
+    never contain the request URL: that holds the zip code and house number.
+    """
     try:
         async with session.get(
             API_URL,
@@ -91,8 +95,14 @@ async def async_fetch_pickups(
         ) as response:
             response.raise_for_status()
             payload = await response.json(content_type=None)
-    except (aiohttp.ClientError, TimeoutError) as err:
-        raise TrashApiConnectionError(str(err)) from err
+    except aiohttp.ClientResponseError as err:
+        # str(err) contains the full request URL, so build the text ourselves.
+        reason = f" {err.message}" if err.message else ""
+        raise TrashApiConnectionError(f"HTTP {err.status}{reason}") from err
+    except TimeoutError as err:
+        raise TrashApiConnectionError("Timeout while contacting the API") from err
+    except aiohttp.ClientError as err:
+        raise TrashApiConnectionError(str(err) or type(err).__name__) from err
     except ValueError as err:
         raise TrashApiDataError("Response is not valid JSON") from err
 

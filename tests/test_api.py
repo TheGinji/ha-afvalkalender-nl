@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date
 import re
 
+import aiohttp
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -80,9 +81,32 @@ async def test_fetch_http_error(hass: HomeAssistant, aioclient_mock) -> None:
         await api.async_fetch_pickups(async_get_clientsession(hass), CONFIG)
 
 
+async def test_fetch_http_error_does_not_leak_the_address(
+    hass: HomeAssistant, aioclient_mock
+) -> None:
+    """The message goes to the log and to repair issues: no URL, no address."""
+    aioclient_mock.get(URL, status=403)
+    with pytest.raises(api.TrashApiConnectionError) as excinfo:
+        await api.async_fetch_pickups(async_get_clientsession(hass), CONFIG)
+
+    message = str(excinfo.value)
+    assert message.startswith("HTTP 403")
+    for secret in ("1234AB", "Leeuwarden", "ZipCode", "HouseNumber", "azurewebsites", "://"):
+        assert secret not in message
+
+
 async def test_fetch_timeout(hass: HomeAssistant, aioclient_mock) -> None:
     aioclient_mock.get(URL, exc=TimeoutError)
-    with pytest.raises(api.TrashApiConnectionError):
+    with pytest.raises(api.TrashApiConnectionError) as excinfo:
+        await api.async_fetch_pickups(async_get_clientsession(hass), CONFIG)
+    assert "Timeout" in str(excinfo.value)
+
+
+async def test_fetch_client_error_keeps_its_message(
+    hass: HomeAssistant, aioclient_mock
+) -> None:
+    aioclient_mock.get(URL, exc=aiohttp.ClientError("boom"))
+    with pytest.raises(api.TrashApiConnectionError, match="boom"):
         await api.async_fetch_pickups(async_get_clientsession(hass), CONFIG)
 
 
